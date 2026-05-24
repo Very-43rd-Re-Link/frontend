@@ -1,61 +1,65 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+const loginOptions = [
+  {
+    label: '카카오로 로그인',
+    backgroundColor: '#FEE500',
+    textColor: '#191919',
+  },
+  {
+    label: '구글로 로그인',
+    backgroundColor: '#FFFFFF',
+    textColor: '#1F1F1F',
+    borderColor: '#DADCE0',
+  },
+  {
+    label: 'Apple로 로그인',
+    backgroundColor: '#000000',
+    textColor: '#FFFFFF',
+  },
+];
 
 export default function HomeScreen() {
+  const handleLoginPress = (provider: string) => {
+    console.log(`${provider} 로그인 테스트를 시작합니다.`);
+  };
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+        <ThemedView style={styles.loginSection}>
+          <ThemedText type="subtitle" style={styles.title}>
+            로그인
           </ThemedText>
+
+          <ThemedView style={styles.buttonGroup}>
+            {loginOptions.map((option) => (
+              <Pressable
+                accessibilityRole="button"
+                key={option.label}
+                onPress={() => handleLoginPress(option.label)}
+                style={({ pressed }) => [
+                  styles.loginButton,
+                  {
+                    backgroundColor: option.backgroundColor,
+                    borderColor: option.borderColor ?? option.backgroundColor,
+                    opacity: pressed ? 0.82 : 1,
+                  },
+                ]}>
+                <ThemedText
+                  type="smallBold"
+                  style={[styles.loginButtonText, { color: option.textColor }]}>
+                  {option.label}
+                </ThemedText>
+              </Pressable>
+            ))}
+          </ThemedView>
         </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
     </ThemedView>
   );
@@ -71,28 +75,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.four,
     alignItems: 'center',
-    gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
   },
-  heroSection: {
+  loginSection: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
     paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    gap: Spacing.five,
+    width: '100%',
   },
   title: {
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
+  buttonGroup: {
     gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    width: '100%',
+    maxWidth: 360,
+  },
+  loginButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 52,
+    borderRadius: Spacing.two,
+    borderWidth: 1,
+    paddingHorizontal: Spacing.four,
+  },
+  loginButtonText: {
+    textAlign: 'center',
   },
 });

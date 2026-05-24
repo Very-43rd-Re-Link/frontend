@@ -394,8 +394,8 @@ Run `git status` when possible before editing.
 - Do not commit, push, merge, or rebase unless explicitly asked.
 - Explain conflicts or unexpected modifications before changing them.
 - Keep changes scoped to the requested task.
-- When creating a branch, use `{git flow}/#{issue-number}-{work-summary-in-English}`.
-  - Example: `feature/#123-login-screen`
+- When creating a branch, use `{git flow}/#{issue-number}-{work-summary-in-English}` and prefer `feat` for feature work.
+  - Example: `feat/#123-login-screen`
   - Keep the work summary short, lowercase, and hyphen-separated.
 
 When asked to commit, write the commit message in Korean:
