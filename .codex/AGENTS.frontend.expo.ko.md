@@ -394,8 +394,8 @@ eas build --platform ios
 - 사용자가 명시하지 않으면 commit, push, merge, rebase를 하지 않는다.
 - 충돌이나 예상치 못한 변경이 있으면 먼저 설명한다.
 - 변경 범위는 요청된 작업에 한정한다.
-- 브랜치를 만들 때는 `{git flow}/#{issue-number}-{작업 내용 영어로}` 형식을 따른다.
-  - 예: `feature/#123-login-screen`
+- 브랜치를 만들 때는 `{git flow}/#{issue-number}-{작업 내용 영어로}` 형식을 따르고, 기능 작업은 `feat`을 우선 사용한다.
+  - 예: `feat/#123-login-screen`
   - 작업 내용은 짧은 영어 소문자와 하이픈으로 작성한다.
 
 커밋 메시지를 작성해야 할 때는 다음 형식을 선호한다.
