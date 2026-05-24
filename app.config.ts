@@ -1,6 +1,10 @@
 import type { ExpoConfig } from 'expo/config';
 
-const kakaoNativeAppKey = process.env.KAKAO_NATIVE_APP_KEY ?? 'KAKAO_NATIVE_APP_KEY_REQUIRED';
+const kakaoNativeAppKey = process.env.KAKAO_NATIVE_APP_KEY;
+
+if (!kakaoNativeAppKey) {
+  throw new Error('KAKAO_NATIVE_APP_KEY 환경변수가 설정되어 있지 않습니다.');
+}
 
 const config: ExpoConfig = {
   name: 'relink_frontend',
@@ -70,7 +74,8 @@ const config: ExpoConfig = {
     eas: {
       projectId: '31897949-f739-4822-87e3-60fc00c0b3aa',
     },
-    kakaoNativeAppKeyConfigured: kakaoNativeAppKey !== 'KAKAO_NATIVE_APP_KEY_REQUIRED',
+    kakaoNativeAppKey,
+    kakaoNativeAppKeyConfigured: true,
   },
 };
 
