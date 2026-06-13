@@ -4,7 +4,6 @@ about: 버그 생성
 title: "[\U0001F41BBUG]"
 labels: ''
 assignees: ''
-
 ---
 
 ### 📌 Description

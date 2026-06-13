@@ -1,22 +1,23 @@
 :root {
-  --relink-font-sans:
-    Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, Helvetica Neue, Segoe UI,
-    Apple SD Gothic Neo, Noto Sans KR, Malgun Gothic, sans-serif;
-  --relink-font-display: Jua, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --relink-font-sans:
+        Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, Helvetica Neue, Segoe UI,
+        Apple SD Gothic Neo, Noto Sans KR, Malgun Gothic, sans-serif;
+    --relink-font-display:
+        Jua, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-  --relink-color-white: #ffffff;
-  --relink-color-ink: #17171b;
-  --relink-color-gray-700: #5e5d5d;
-  --relink-color-gray-500: #7c7d86;
-  --relink-color-gray-400: #b4b4b4;
-  --relink-color-gray-200: #e6e6e6;
-  --relink-color-lavender-intense: #7f87ff;
-  --relink-color-lavender-middle: #cdd0ff;
-  --relink-color-lavender-soft: #eef0ff;
-  --relink-color-blue: #5888ff;
-  --relink-color-mint: #4fd7c5;
-  --relink-color-yellow: #ffd166;
-  --relink-color-coral: #ff8f70;
-  --relink-color-rose: #ff7aa2;
-  --relink-color-green: #77d46b;
+    --relink-color-white: #ffffff;
+    --relink-color-ink: #17171b;
+    --relink-color-gray-700: #5e5d5d;
+    --relink-color-gray-500: #7c7d86;
+    --relink-color-gray-400: #b4b4b4;
+    --relink-color-gray-200: #e6e6e6;
+    --relink-color-lavender-intense: #7f87ff;
+    --relink-color-lavender-middle: #cdd0ff;
+    --relink-color-lavender-soft: #eef0ff;
+    --relink-color-blue: #5888ff;
+    --relink-color-mint: #4fd7c5;
+    --relink-color-yellow: #ffd166;
+    --relink-color-coral: #ff8f70;
+    --relink-color-rose: #ff7aa2;
+    --relink-color-green: #77d46b;
 }

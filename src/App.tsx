@@ -1,10 +1,10 @@
 import { MobileScreenLayout } from '@/components/mobile-screen-layout';
-import { HomeScreen } from '@/features/home/home-screen';
+import { HomeScreen } from '@/view/home-screen';
 
 export default function App() {
-  return (
-    <MobileScreenLayout>
-      <HomeScreen />
-    </MobileScreenLayout>
-  );
+    return (
+        <MobileScreenLayout>
+            <HomeScreen />
+        </MobileScreenLayout>
+    );
 }

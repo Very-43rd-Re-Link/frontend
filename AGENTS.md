@@ -1,4 +1,4 @@
-# AGENTS.md — React + Vite Frontend
+# AGENTS.md — React + Vite PWA Frontend
 
 > Scope: 이 규칙은 현재 디렉터리와 하위 디렉터리에 적용됩니다.
 
@@ -16,9 +16,11 @@
 - Vite
 - TypeScript
 - Tailwind CSS
+- PWA 중심의 웹 프론트엔드
 
 ## 구현 규칙
 
+- 앱은 Expo/React Native가 아닌 브라우저 기반 PWA로 구현합니다.
 - 화면 레이아웃은 Tailwind class 중심으로 작성합니다.
 - 반복되거나 의미가 분명한 UI는 컴포넌트로 분리합니다.
 - 색상, 폰트, 그림자 값은 `tailwind.config.js`와 `src/styles/token.css`의 토큰을 우선 사용합니다.
@@ -29,5 +31,6 @@
 ## 주의
 
 - Expo, React Native, native prebuild 구조는 더 이상 사용하지 않습니다.
+- `android`, `ios`, `.expo`, `expo-env.d.ts` 등 native/prebuild 산출물은 새 구현에서 참조하거나 확장하지 않습니다.
 - 새 의존성 추가 전 기존 의존성으로 해결 가능한지 확인합니다.
 - 민감정보, 토큰, `.env` 값은 코드나 로그에 노출하지 않습니다.

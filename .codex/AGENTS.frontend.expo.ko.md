@@ -76,8 +76,8 @@ Expo 프로젝트에서는 다음을 우선한다.
 - Expo Go, development build, EAS Build의 차이를 구분해서 설명한다.
 - 네이티브 모듈이 필요한 라이브러리는 Expo Go에서 동작하지 않을 수 있음을 확인한다.
 - 권한 설정은 플랫폼별 설정을 확인한다.
-  - iOS: `Info.plist`에 반영되는 Expo config
-  - Android: `AndroidManifest.xml`에 반영되는 Expo config
+    - iOS: `Info.plist`에 반영되는 Expo config
+    - Android: `AndroidManifest.xml`에 반영되는 Expo config
 - 앱 아이콘, 스플래시, 딥링크, 스킴, 번들 ID, 패키지명 변경은 빌드 영향이 있으므로 반드시 영향 범위를 설명한다.
 
 ---
@@ -151,8 +151,8 @@ React / React Native 컴포넌트는 다음을 따른다.
 - 리스트에는 안정적인 key를 사용한다.
 - loading, empty, error 상태를 함께 고려한다.
 - 접근성을 고려한다.
-  - 누를 수 있는 요소는 의미 있는 label을 갖게 한다.
-  - 텍스트 크기, 터치 영역, 대비를 고려한다.
+    - 누를 수 있는 요소는 의미 있는 label을 갖게 한다.
+    - 텍스트 크기, 터치 영역, 대비를 고려한다.
 - 플랫폼별 분기가 필요하면 `Platform.select` 또는 파일 분리(`*.ios.tsx`, `*.android.tsx`)를 검토한다.
 - 스타일 시스템이 있다면 이를 우선 사용하고, 임의 inline style 남발을 피한다.
 
@@ -395,8 +395,8 @@ eas build --platform ios
 - 충돌이나 예상치 못한 변경이 있으면 먼저 설명한다.
 - 변경 범위는 요청된 작업에 한정한다.
 - 브랜치를 만들 때는 `{git flow}/#{issue-number}-{작업 내용 영어로}` 형식을 따르고, 기능 작업은 `feat`을 우선 사용한다.
-  - 예: `feat/#123-login-screen`
-  - 작업 내용은 짧은 영어 소문자와 하이픈으로 작성한다.
+    - 예: `feat/#123-login-screen`
+    - 작업 내용은 짧은 영어 소문자와 하이픈으로 작성한다.
 
 커밋 메시지를 작성해야 할 때는 다음 형식을 선호한다.
 
@@ -490,8 +490,8 @@ GitHub PR 본문이 아닌 일반 변경 요약을 요청받으면 다음 형식
 ```markdown
 ## 요약
 
-- 
-- 
+-
+-
 
 ## 검증
 
@@ -499,7 +499,7 @@ GitHub PR 본문이 아닌 일반 변경 요약을 요청받으면 다음 형식
 
 ## 참고
 
-- 
+-
 ```
 
 검증을 실행하지 못했다면 다음처럼 쓴다.
