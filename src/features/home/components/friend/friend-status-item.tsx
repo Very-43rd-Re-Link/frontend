@@ -1,6 +1,6 @@
-import { ActiveLightningBadge } from '@/features/home/components/active-lightning-badge';
-import { FriendStatusRing } from '@/features/home/components/friend-status-ring';
-import { GenericAvatar } from '@/components/generic-avatar';
+import { ActiveLightningBadge } from '@/features/home/components/friend/active-lightning-badge';
+import { FriendStatusRing } from '@/features/home/components/friend/friend-status-ring';
+import { GenericAvatar } from '@/components/common/nav/generic-avatar';
 import { type RingSlots } from '@/features/home/constants/ring-colors';
 
 type FriendStatusItemProps = {
@@ -17,7 +17,7 @@ export function FriendStatusItem({
   activeColor = '#66f2f6',
 }: FriendStatusItemProps) {
   return (
-    <div className="flex w-1/5 shrink-0 flex-col items-center">
+    <div className="flex h-[88px] basis-1/5 shrink-0 grow-0 flex-col items-center">
       <div className="relative">
         <FriendStatusRing slots={slots}>
           <GenericAvatar size={46} />

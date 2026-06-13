@@ -1,34 +1,32 @@
-import { HelpBadge } from '@/components/common/help-badge';
+import genericProfileIcon from '@/assets/icons/generic-avatar.svg';
+import { ScheduleCard, type ScheduleCardProps } from '@/features/home/components/schedule/schedule-card';
+
+const schedules: ScheduleCardProps[] = [
+    {
+        title: '박기준 밥약',
+        location: '고기 마을 신촌점',
+        time: '13:00-14:30',
+        date: '2026.05.30 (토)',
+        groupImageSrc: genericProfileIcon,
+        memberCount: 2,
+    },
+    {
+        title: '송도 밥약',
+        location: '인생분식 연세대 국제캠퍼스점',
+        time: '13:00-14:30',
+        date: '2026.05.30 (토)',
+        groupImageSrc: genericProfileIcon,
+        memberCount: 3,
+    },
+];
 
 export function ScheduleSection() {
-  return (
-    <section className="mt-[50px] flex flex-col gap-[5px]">
-      <ScheduleCard />
-      <ScheduleCard shadow />
-    </section>
-  );
-}
-
-function ScheduleCard({ shadow = false }: { shadow?: boolean }) {
-  return (
-    <article
-      className={`flex h-[68px] items-end justify-between rounded border border-relink-card bg-relink-white pb-[13px] pl-3.5 pr-[13px] pt-2 ${
-        shadow ? 'shadow-relink-card' : ''
-      }`}
-    >
-      <LocationPin />
-      <HelpBadge />
-    </article>
-  );
-}
-
-function LocationPin() {
-  return (
-    <div className="flex h-[22px] w-[18px] flex-col items-center">
-      <div className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-relink-lavender-intense bg-relink-white">
-        <div className="h-1 w-1 rounded-full bg-relink-lavender-intense" />
-      </div>
-      <div className="-mt-[3px] h-[9px] w-[9px] rotate-45 border-b-2 border-r-2 border-relink-lavender-intense bg-relink-white" />
-    </div>
-  );
+    return (
+        <section className="flex flex-col gap-2 font-display">
+            <p className="text-lg pb-2 text-gray-700">다가오는 약속</p>
+            {schedules.map((schedule) => (
+                <ScheduleCard key={`${schedule.title}-${schedule.date}-${schedule.time}`} {...schedule} />
+            ))}
+        </section>
+    );
 }

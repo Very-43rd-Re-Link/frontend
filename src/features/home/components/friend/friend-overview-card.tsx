@@ -1,5 +1,5 @@
-import { FriendOverviewHeader } from '@/features/home/components/friend-overview-header';
-import { FriendStatusItem } from '@/features/home/components/friend-status-item';
+import { FriendOverviewHeader } from '@/features/home/components/friend/friend-overview-header';
+import { FriendStatusItem } from '@/features/home/components/friend/friend-status-item';
 import { type RingSlots } from '@/features/home/constants/ring-colors';
 
 type FriendOverview = {
@@ -39,10 +39,10 @@ const friends: FriendOverview[] = [
 
 const FriendOverviewCard = () => {
     return (
-        <section className="flex h-[125px] flex-col overflow-hidden rounded-[10px] border border-relink-card bg-relink-white px-[13px] pt-[13px] shadow-relink-card">
+        <section className="flex h-[142px] flex-none flex-col overflow-hidden rounded-[10px] border border-relink-card bg-relink-white p-3 shadow-relink-card">
             <FriendOverviewHeader />
 
-            <div className="relink-hidden-scrollbar mt-[3px] flex min-h-0 flex-1 items-start overflow-x-auto overflow-y-hidden px-[5px] pb-1">
+            <div className="relink-hidden-scrollbar mt-1 flex h-[96px] items-start overflow-x-auto overflow-y-hidden pt-1">
                 {friends.map((friend) => (
                     <FriendStatusItem
                         key={friend.name}

@@ -7,3 +7,5 @@ export const ringColorMap = {
   green: '#74dc94',
   yellow: '#fee73d',
 } as const;
+
+export const emptySlotColor = '#d9d9d9';

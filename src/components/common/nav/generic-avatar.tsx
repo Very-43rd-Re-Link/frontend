@@ -1,4 +1,4 @@
-import genericAvatarIcon from '../../assets/icons/generic-avatar.svg';
+import genericAvatarIcon from '@/assets/icons/generic-avatar.svg';
 
 type GenericAvatarProps = {
     size?: number;

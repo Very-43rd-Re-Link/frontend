@@ -1,5 +1,5 @@
 import lightningIcon from '@/assets/icons/lightning.svg';
-import { HelpBadge } from '@/components/common/help-badge';
+import { HelpBadge } from '@/components/common/nav/help-badge';
 import { SegmentTab } from '@/features/home/components/segment-tab';
 
 export function FriendOverviewHeader() {

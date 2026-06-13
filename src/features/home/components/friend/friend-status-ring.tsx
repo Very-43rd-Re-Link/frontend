@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { type RingSlots, ringColorMap } from '@/features/home/constants/ring-colors';
+import { emptySlotColor, type RingSlots, ringColorMap } from '@/features/home/constants/ring-colors';
 
 type FriendStatusRingProps = {
   slots: RingSlots;
@@ -9,14 +9,13 @@ type FriendStatusRingProps = {
 
 const SLOT_COUNT = 8;
 const DEGREES_PER_SLOT = 360 / SLOT_COUNT;
-const EMPTY_SLOT_COLOR = '#d9d9d9';
 
 function createConicGradient(slots: RingSlots) {
   const segments = Array.from({ length: SLOT_COUNT }, (_, slotIndex) => {
     const color = slots[slotIndex];
     const start = slotIndex * DEGREES_PER_SLOT;
     const end = start + DEGREES_PER_SLOT;
-    const segmentColor = color ? ringColorMap[color] : EMPTY_SLOT_COLOR;
+    const segmentColor = color ? ringColorMap[color] : emptySlotColor;
 
     return `${segmentColor} ${start}deg ${end}deg`;
   });

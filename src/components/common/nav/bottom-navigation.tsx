@@ -1,8 +1,8 @@
-import calendarIcon from '../../../../assets/icons/calendar.svg';
-import chatIcon from '../../../../assets/icons/chat.svg';
-import friendsIcon from '../../../../assets/icons/friends.svg';
-import homeIcon from '../../../../assets/icons/home.svg';
-import mypageIcon from '../../../../assets/icons/mypage.svg';
+import calendarIcon from '@/assets/icons/calendar.svg';
+import chatIcon from '@/assets/icons/chat.svg';
+import friendsIcon from '@/assets/icons/friends.svg';
+import homeIcon from '@/assets/icons/home.svg';
+import mypageIcon from '@/assets/icons/mypage.svg';
 
 type BottomNavigationItem = {
     label: string;
