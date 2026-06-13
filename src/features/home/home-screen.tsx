@@ -1,5 +1,4 @@
 import { GenericAvatar } from '@/components/generic-avatar';
-import { MobileScreenLayout } from '@/components/mobile-screen-layout';
 import lightningIcon from '../../../assets/icons/lightning.svg';
 import logoImage from '../../../assets/images/logo.png';
 import { BottomNavigation } from './components/bottom-navigation';
@@ -40,7 +39,7 @@ type RingColor = 'cyan' | 'green' | 'yellow';
 
 export function HomeScreen() {
   return (
-    <MobileScreenLayout>
+    <>
       <div className="h-full px-3 pb-[62px]">
         <header className="flex h-14 items-start justify-start pl-[19px] pt-2">
           <img src={logoImage} alt="ReLink 로고" className="h-7 w-7 object-contain" />
@@ -68,7 +67,7 @@ export function HomeScreen() {
 
       <FloatingAddButton />
       <BottomNavigation />
-    </MobileScreenLayout>
+    </>
   );
 }
 

@@ -12,6 +12,7 @@ module.exports = tseslint.config(
       'android',
       'ios',
       'eslint.config.js',
+      'postcss.config.cjs',
       'tailwind.config.js',
     ],
   },
