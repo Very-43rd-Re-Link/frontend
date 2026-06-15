@@ -1,4 +1,3 @@
-import {BottomNavigation} from '@/components/common/nav/bottom-navigation';
 import {FloatingAddButton} from '@/components/common/floating-add-button';
 import {FriendOverviewCard} from '@/features/home/components/friend/friend-overview-card';
 import {HomeHeader} from '@/components/common/nav/home-header';
@@ -19,7 +18,6 @@ export function HomeScreen() {
             </main>
 
             <FloatingAddButton/>
-            <BottomNavigation/>
         </div>
     );
 }
