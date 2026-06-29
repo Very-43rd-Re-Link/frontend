@@ -39,7 +39,14 @@ export const statusConfig: Record<
 export const scheduledBlocks: ScheduledBlock[] = [
     { dayIndex: 1, startHour: 9, endHour: 11, title: '스케줄 제목', location: '장소' },
     { dayIndex: 2, startHour: 11, endHour: 13, title: '스케줄 제목', location: '장소' },
-    { dayIndex: 3, startHour: 20, endHour: 22, title: '번개준 번약', location: '고기마을 신촌점' },
+    {
+        dayIndex: 3,
+        startHour: 19,
+        endHour: 22,
+        title: '성민 학생 과외',
+        location: '수원시 이의동',
+        memo: '오늘은 10분 빨리 도착하기!',
+    },
     { dayIndex: 4, startHour: 15, endHour: 17, title: '다가오는 약속 제목', location: '장소' },
     { dayIndex: 5, startHour: 13, endHour: 16, title: '스케줄 제목', location: '장소' },
 ];

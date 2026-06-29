@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { LightningCompleteToast, LightningSetupDialog } from '@/components/common/lightning-setup-dialog';
+import { routePaths } from '@/constants/route-paths';
 
 type FloatingAddButtonPlacement = 'screen' | 'inline';
 type FloatingActionKind = 'calendar' | 'friend' | 'group' | 'lightning';
@@ -47,6 +49,7 @@ const placementClassNames: Record<
 };
 
 export function FloatingAddButton({ placement = 'screen' }: FloatingAddButtonProps) {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
     const [isLightningSetupOpen, setIsLightningSetupOpen] = useState(false);
@@ -75,6 +78,21 @@ export function FloatingAddButton({ placement = 'screen' }: FloatingAddButtonPro
 
         if (kind === 'lightning') {
             setIsLightningSetupOpen(true);
+            return;
+        }
+
+        if (kind === 'calendar') {
+            navigate(routePaths.appointmentSchedule);
+            return;
+        }
+
+        if (kind === 'friend') {
+            navigate(routePaths.appointmentFriends);
+            return;
+        }
+
+        if (kind === 'group') {
+            navigate(routePaths.appointmentGroups);
         }
     };
 

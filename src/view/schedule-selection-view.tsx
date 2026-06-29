@@ -1,10 +1,13 @@
-import { useMemo, useState } from 'react';
+import type { PointerEvent } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
-import { FloatingAddButton } from '@/components/common/floating-add-button';
+import type { AppointmentFriend } from '@/features/schedule/components/appointment-friend-types';
+import { AppointmentProposalReview } from '@/features/schedule/components/appointment-proposal-review';
+import {
+    ScheduleSelectionScreen,
+    type StatusChangeMenuState,
+} from '@/features/schedule/components/schedule-selection-screen';
 import { editableStatusOrder } from '@/features/schedule/constants';
-import { ScheduleGrid } from '@/features/schedule/components/schedule-grid';
-import { ScheduleHeader } from '@/features/schedule/components/schedule-header';
-import { WeekNavigator } from '@/features/schedule/components/week-navigator';
 import {
     addDays,
     createInitialSlotStatuses,
@@ -13,28 +16,70 @@ import {
     getSlotKey,
     getWeekDates,
 } from '@/features/schedule/schedule-utils';
-import type { EditableSlotStatus } from '@/features/schedule/types';
+import type { AppointmentSelection, EditableSlotStatus, ScheduledBlock } from '@/features/schedule/types';
 
-export function ScheduleSelectionView() {
+type DragSelection = {
+    anchorStatus: EditableSlotStatus;
+    slotKeys: string[];
+    hasMoved: boolean;
+};
+
+type AppointmentProposalState = {
+    selection: AppointmentSelection;
+    selectedFriends: AppointmentFriend[];
+};
+
+type ScheduleSelectionViewProps = {
+    title?: string;
+    showFloatingAction?: boolean;
+    mode?: 'calendar' | 'appointment';
+};
+
+export function ScheduleSelectionView({
+    title = '캘린더',
+    showFloatingAction = true,
+    mode = 'calendar',
+}: ScheduleSelectionViewProps) {
     const [baseDate, setBaseDate] = useState(() => new Date());
     const [slotStatuses, setSlotStatuses] = useState<Record<string, EditableSlotStatus>>(() =>
         createInitialSlotStatuses(),
     );
+    const [selectedSchedule, setSelectedSchedule] = useState<ScheduledBlock | null>(null);
+    const [appointmentSelection, setAppointmentSelection] = useState<AppointmentSelection | null>(null);
+    const [appointmentProposal, setAppointmentProposal] = useState<AppointmentProposalState | null>(null);
+    const [dragSelection, setDragSelection] = useState<DragSelection | null>(null);
+    const [statusChangeMenu, setStatusChangeMenu] = useState<StatusChangeMenuState | null>(null);
+    const dragSelectionRef = useRef<DragSelection | null>(null);
+    const suppressNextClickRef = useRef(false);
 
     const weekDates = useMemo(() => getWeekDates(baseDate), [baseDate]);
     const weekTitle = useMemo(() => formatWeekTitle(weekDates), [weekDates]);
     const scheduledSlotMap = useMemo(() => createScheduledSlotMap(), []);
+    const selectedSlotKeys = useMemo(
+        () => new Set(statusChangeMenu?.slotKeys ?? dragSelection?.slotKeys ?? appointmentSelection?.slotKeys ?? []),
+        [appointmentSelection, dragSelection, statusChangeMenu],
+    );
 
     const changeWeek = (weekOffset: number) => {
         setBaseDate((current) => addDays(current, weekOffset * 7));
     };
 
-    const handleSlotClick = (dayIndex: number, hour: number) => {
-        const slotKey = getSlotKey(dayIndex, hour);
+    const updateDragSelection = (nextSelection: DragSelection | null) => {
+        dragSelectionRef.current = nextSelection;
+        setDragSelection(nextSelection);
+    };
 
-        if (scheduledSlotMap.has(slotKey)) {
+    const handleSlotClick = (dayIndex: number, hour: number) => {
+        if (mode === 'appointment') {
             return;
         }
+
+        if (suppressNextClickRef.current) {
+            suppressNextClickRef.current = false;
+            return;
+        }
+
+        const slotKey = getSlotKey(dayIndex, hour);
 
         setSlotStatuses((current) => {
             const currentStatus = current[slotKey] ?? 'available';
@@ -48,24 +93,199 @@ export function ScheduleSelectionView() {
         });
     };
 
-    return (
-        <div className="relative flex h-full min-h-0 flex-col gap-5 bg-relink-white px-5 pt-10 font-display">
-            <ScheduleHeader />
+    const handleSlotPointerDown = (
+        dayIndex: number,
+        hour: number,
+        event: PointerEvent<HTMLButtonElement>,
+    ) => {
+        if (event.button !== 0 || scheduledSlotMap.has(getSlotKey(dayIndex, hour))) {
+            return;
+        }
 
-            <main className="relink-hidden-scrollbar flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 pb-2">
-                <WeekNavigator
-                    title={weekTitle}
-                    onPreviousWeek={() => changeWeek(-1)}
-                    onNextWeek={() => changeWeek(1)}
-                />
-                <ScheduleGrid
-                    weekDates={weekDates}
-                    slotStatuses={slotStatuses}
-                    scheduledSlotMap={scheduledSlotMap}
-                    onSlotClick={handleSlotClick}
-                />
-                <FloatingAddButton placement="inline" />
-            </main>
-        </div>
+        const slotKey = getSlotKey(dayIndex, hour);
+        const anchorStatus = slotStatuses[slotKey] ?? 'available';
+
+        if (mode === 'appointment' && !isAppointmentSelectableStatus(anchorStatus)) {
+            return;
+        }
+
+        setStatusChangeMenu(null);
+        updateDragSelection({
+            anchorStatus,
+            slotKeys: [slotKey],
+            hasMoved: false,
+        });
+    };
+
+    const handleSlotPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
+        const currentSelection = dragSelectionRef.current;
+
+        if (!currentSelection || event.buttons !== 1) {
+            return;
+        }
+
+        const target = document
+            .elementFromPoint(event.clientX, event.clientY)
+            ?.closest<HTMLButtonElement>('[data-day-index][data-hour]');
+
+        if (!target) {
+            return;
+        }
+
+        const dayIndex = Number(target.dataset.dayIndex);
+        const hour = Number(target.dataset.hour);
+        const slotKey = getSlotKey(dayIndex, hour);
+        const slotStatus = slotStatuses[slotKey] ?? 'available';
+
+        if (scheduledSlotMap.has(slotKey)) {
+            return;
+        }
+
+        if (mode === 'appointment' && !isAppointmentSelectableStatus(slotStatus)) {
+            return;
+        }
+
+        if (mode === 'calendar' && slotStatus !== currentSelection.anchorStatus) {
+            return;
+        }
+
+        if (currentSelection.slotKeys.includes(slotKey)) {
+            return;
+        }
+
+        updateDragSelection({
+            ...currentSelection,
+            slotKeys: [...currentSelection.slotKeys, slotKey],
+            hasMoved: true,
+        });
+    };
+
+    const handleSlotPointerUp = (event: PointerEvent<HTMLElement>) => {
+        const currentSelection = dragSelectionRef.current;
+
+        if (!currentSelection) {
+            return;
+        }
+
+        if (mode === 'appointment') {
+            if (currentSelection.hasMoved && currentSelection.slotKeys.length > 1) {
+                setAppointmentSelection({
+                    slotKeys: currentSelection.slotKeys,
+                    label: formatAppointmentSelectionLabel(currentSelection.slotKeys, weekDates),
+                });
+            }
+
+            updateDragSelection(null);
+            return;
+        }
+
+        if (currentSelection.hasMoved && currentSelection.slotKeys.length > 1) {
+            suppressNextClickRef.current = true;
+            setStatusChangeMenu({
+                currentStatus: currentSelection.anchorStatus,
+                slotKeys: currentSelection.slotKeys,
+                position: {
+                    x: Math.max(12, Math.min(event.clientX, window.innerWidth - 132)),
+                    y: Math.max(12, Math.min(event.clientY + 10, window.innerHeight - 140)),
+                },
+            });
+        }
+
+        updateDragSelection(null);
+    };
+
+    const changeSelectedSlotsStatus = (nextStatus: EditableSlotStatus) => {
+        if (!statusChangeMenu) {
+            return;
+        }
+
+        setSlotStatuses((current) => {
+            const nextStatuses = { ...current };
+
+            statusChangeMenu.slotKeys.forEach((slotKey) => {
+                nextStatuses[slotKey] = nextStatus;
+            });
+
+            return nextStatuses;
+        });
+        setStatusChangeMenu(null);
+    };
+
+    if (appointmentProposal) {
+        return (
+            <AppointmentProposalReview
+                selection={appointmentProposal.selection}
+                selectedFriends={appointmentProposal.selectedFriends}
+                onBack={() => setAppointmentProposal(null)}
+            />
+        );
+    }
+
+    return (
+        <ScheduleSelectionScreen
+            title={title}
+            weekTitle={weekTitle}
+            weekDates={weekDates}
+            slotStatuses={slotStatuses}
+            scheduledSlotMap={scheduledSlotMap}
+            selectedSlotKeys={selectedSlotKeys}
+            showFloatingAction={showFloatingAction}
+            statusChangeMenu={statusChangeMenu}
+            selectedSchedule={selectedSchedule}
+            appointmentSelection={appointmentSelection}
+            onPointerCancel={() => updateDragSelection(null)}
+            onPointerUp={handleSlotPointerUp}
+            onPreviousWeek={() => changeWeek(-1)}
+            onNextWeek={() => changeWeek(1)}
+            onSlotClick={handleSlotClick}
+            onSlotPointerDown={handleSlotPointerDown}
+            onSlotPointerMove={handleSlotPointerMove}
+            onSlotPointerUp={handleSlotPointerUp}
+            onScheduledBlockClick={setSelectedSchedule}
+            onStatusSelect={changeSelectedSlotsStatus}
+            onStatusMenuClose={() => setStatusChangeMenu(null)}
+            onScheduleModalClose={() => setSelectedSchedule(null)}
+            onAppointmentSelectionDismiss={() => setAppointmentSelection(null)}
+            onAppointmentSelectionNext={(selectedFriends) => {
+                if (!appointmentSelection) {
+                    return;
+                }
+
+                setAppointmentProposal({
+                    selection: appointmentSelection,
+                    selectedFriends,
+                });
+            }}
+        />
     );
+}
+
+export function AppointmentScheduleSelectionView() {
+    return <ScheduleSelectionView title="약속 잡기" showFloatingAction={false} mode="appointment" />;
+}
+
+function isAppointmentSelectableStatus(status: EditableSlotStatus) {
+    return status === 'available' || status === 'adjustable';
+}
+
+function formatAppointmentSelectionLabel(slotKeys: string[], weekDates: Date[]) {
+    const slots = slotKeys
+        .map((slotKey) => {
+            const [dayIndex, hour] = slotKey.split('-').map(Number);
+
+            return { dayIndex, hour };
+        })
+        .sort((first, second) => first.dayIndex - second.dayIndex || first.hour - second.hour);
+    const firstSlot = slots[0];
+    const sameDaySlots = slots.filter((slot) => slot.dayIndex === firstSlot.dayIndex);
+    const startHour = Math.min(...sameDaySlots.map((slot) => slot.hour));
+    const endHour = Math.max(...sameDaySlots.map((slot) => slot.hour)) + 1;
+    const date = weekDates[firstSlot.dayIndex];
+    const weekday = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+
+    return `${date.getDate()}일 (${weekday}) ${formatHour(startHour)} ~ ${formatHour(endHour)}`;
+}
+
+function formatHour(hour: number) {
+    return `${String(hour).padStart(2, '0')}:00`;
 }

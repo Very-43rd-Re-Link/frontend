@@ -8,4 +8,10 @@ export type ScheduledBlock = {
     endHour: number;
     title: string;
     location: string;
+    memo?: string;
+};
+
+export type AppointmentSelection = {
+    slotKeys: string[];
+    label: string;
 };
