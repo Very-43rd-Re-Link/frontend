@@ -33,6 +33,28 @@
     animation: relink-float-menu-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@keyframes relink-spinner-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.relink-loading-spinner {
+    background:
+        conic-gradient(
+            from 0deg,
+            transparent 0deg,
+            rgba(127, 135, 255, 0.14) 72deg,
+            rgba(127, 135, 255, 0.42) 168deg,
+            var(--relink-color-lavender-intense),
+            var(--relink-color-lavender-intense) 318deg,
+            transparent 360deg
+        );
+    animation: relink-spinner-spin 720ms linear infinite;
+    box-shadow: 0 4px 16px rgba(127, 135, 255, 0.3);
+    mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+}
+
 :root {
     --font-sans:
         Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, Helvetica Neue, Segoe UI,

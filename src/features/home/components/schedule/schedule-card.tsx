@@ -1,4 +1,5 @@
-import locationPinIcon from '@/assets/icons/location-pin.svg';
+import locationPinSvg from '@/assets/icons/location-pin.svg';
+import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
 import { HelpBadge } from '@/components/common/nav/help-badge';
 
 export type ScheduleCardProps = {
@@ -6,7 +7,7 @@ export type ScheduleCardProps = {
   location: string;
   time: string;
   date: string;
-  groupImageSrc: string;
+  groupImageSvg: string;
   memberCount: number;
 };
 
@@ -15,7 +16,7 @@ export function ScheduleCard({
   location,
   time,
   date,
-  groupImageSrc,
+  groupImageSvg,
   memberCount,
 }: ScheduleCardProps) {
   return (
@@ -25,11 +26,11 @@ export function ScheduleCard({
       <div className="flex flex-1 flex-col justify-between">
         <div className="flex items-center gap-3">
           <h3 className="font-display text-l text-relink-gray-700">{title}</h3>
-          <MemberImageStack imageSrc={groupImageSrc} count={memberCount} />
+          <MemberImageStack svg={groupImageSvg} count={memberCount} />
         </div>
 
         <div className="flex items-center gap-3">
-          <img src={locationPinIcon} alt="" aria-hidden="true" className="h-7 w-6 object-contain" />
+          <InlineSvgIcon svg={locationPinSvg} className="h-7 w-6 object-contain" />
           <p className="font-display text-md text-relink-gray-700">{location}</p>
         </div>
       </div>
@@ -45,7 +46,7 @@ export function ScheduleCard({
   );
 }
 
-function MemberImageStack({ imageSrc, count }: { imageSrc: string; count: number }) {
+function MemberImageStack({ svg, count }: { svg: string; count: number }) {
   const imageSize = 32;
   const overlapOffset = imageSize * 0.8;
   const stackWidth = imageSize + Math.max(count - 1, 0) * overlapOffset;
@@ -57,10 +58,9 @@ function MemberImageStack({ imageSrc, count }: { imageSrc: string; count: number
       aria-label={`${count}명 참여`}
     >
       {Array.from({ length: count }, (_, index) => (
-        <img
+        <InlineSvgIcon
           key={index}
-          src={imageSrc}
-          alt=""
+          svg={svg}
           aria-hidden="true"
           className="absolute top-0 h-6 w-6 object-contain"
           style={{ left: index * overlapOffset }}

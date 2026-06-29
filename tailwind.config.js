@@ -21,6 +21,7 @@ const relinkColors = {
     cyan: '#61dddd',
     scheduleGreen: '#74dc94',
     scheduleYellow: '#fee73d',
+    schedulePink: '#ffb4c8',
 };
 
 /** @type {import('tailwindcss').Config} */

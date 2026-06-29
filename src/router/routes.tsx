@@ -4,15 +4,13 @@ import { routePaths } from '@/constants/route-paths';
 import { FriendsListView } from '@/view/friend-list-view';
 import { HomeScreen } from '@/view/home-screen';
 import { PlaceholderView } from '@/view/placeholder-view';
+import { ScheduleSelectionView } from '@/view/schedule-selection-view';
 
 export function AppRoutes() {
     return (
         <Routes>
             <Route path={routePaths.home} element={<HomeScreen />} />
-            <Route
-                path={routePaths.calendar}
-                element={<PlaceholderView title="캘린더" description="일정 화면 라우터 예시입니다." />}
-            />
+            <Route path={routePaths.calendar} element={<ScheduleSelectionView />} />
             <Route path={routePaths.friends} element={<FriendsListView />} />
             <Route
                 path={routePaths.chat}

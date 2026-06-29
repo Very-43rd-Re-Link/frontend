@@ -1,4 +1,4 @@
-import genericProfileIcon from '@/assets/icons/generic-avatar.svg';
+import genericProfileSvg from '@/assets/icons/generic-avatar.svg';
 import { ScheduleCard, type ScheduleCardProps } from '@/features/home/components/schedule/schedule-card';
 
 const schedules: ScheduleCardProps[] = [
@@ -7,7 +7,7 @@ const schedules: ScheduleCardProps[] = [
         location: '고기 마을 신촌점',
         time: '13:00-14:30',
         date: '2026.05.30 (토)',
-        groupImageSrc: genericProfileIcon,
+        groupImageSvg: genericProfileSvg,
         memberCount: 2,
     },
     {
@@ -15,7 +15,7 @@ const schedules: ScheduleCardProps[] = [
         location: '인생분식 연세대 국제캠퍼스점',
         time: '13:00-14:30',
         date: '2026.05.30 (토)',
-        groupImageSrc: genericProfileIcon,
+        groupImageSvg: genericProfileSvg,
         memberCount: 3,
     },
 ];

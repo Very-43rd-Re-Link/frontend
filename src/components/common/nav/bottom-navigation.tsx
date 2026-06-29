@@ -1,26 +1,27 @@
 import { NavLink } from 'react-router-dom';
 
-import calendarIcon from '@/assets/icons/calendar.svg';
-import chatIcon from '@/assets/icons/chat.svg';
-import friendsIcon from '@/assets/icons/friends.svg';
-import homeIcon from '@/assets/icons/home.svg';
-import mypageIcon from '@/assets/icons/mypage.svg';
+import calendarSvg from '@/assets/icons/calendar.svg';
+import chatSvg from '@/assets/icons/chat.svg';
+import friendsSvg from '@/assets/icons/friends.svg';
+import homeSvg from '@/assets/icons/home.svg';
+import mypageSvg from '@/assets/icons/mypage.svg';
+import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
 import { routePaths } from '@/constants/route-paths';
 
 type BottomNavigationItem = {
     label: string;
     path: string;
-    source: string;
+    svg: string;
     width: number;
     height: number;
 };
 
 const navigationItems: BottomNavigationItem[] = [
-    { label: '홈', path: routePaths.home, source: homeIcon, width: 43, height: 35 },
-    { label: '캘린더', path: routePaths.calendar, source: calendarIcon, width: 34, height: 36 },
-    { label: '친구', path: routePaths.friends, source: friendsIcon, width: 35, height: 35 },
-    { label: '채팅', path: routePaths.chat, source: chatIcon, width: 34, height: 34 },
-    { label: '마이페이지', path: routePaths.mypage, source: mypageIcon, width: 31, height: 31 },
+    { label: '홈', path: routePaths.home, svg: homeSvg, width: 43, height: 35 },
+    { label: '캘린더', path: routePaths.calendar, svg: calendarSvg, width: 34, height: 36 },
+    { label: '친구', path: routePaths.friends, svg: friendsSvg, width: 35, height: 35 },
+    { label: '채팅', path: routePaths.chat, svg: chatSvg, width: 34, height: 34 },
+    { label: '마이페이지', path: routePaths.mypage, svg: mypageSvg, width: 31, height: 31 },
 ];
 
 export function BottomNavigation() {
@@ -34,10 +35,8 @@ export function BottomNavigation() {
                     className="flex h-[43px] w-[43px] items-center justify-center"
                 >
                     {({ isActive }) => (
-                        <img
-                            src={item.source}
-                            alt=""
-                            aria-hidden="true"
+                        <InlineSvgIcon
+                            svg={item.svg}
                             className={`block object-contain transition-opacity ${
                                 isActive ? 'opacity-100' : 'opacity-45'
                             }`}

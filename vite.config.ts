@@ -1,9 +1,10 @@
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
+import svgLoader from 'vite-svg-loader';
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [react(), svgLoader({ defaultImport: 'raw' })],
     resolve: {
         alias: [
             {
