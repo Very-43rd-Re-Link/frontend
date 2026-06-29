@@ -4,6 +4,10 @@ export { FriendStatusProfile } from '@/components/common/friend-status/friend-st
 export { FriendStatusRing } from '@/components/common/friend-status/friend-status-ring';
 export { ProgressRow } from '@/components/common/friend-status/progress-row';
 export {
+    applyFriendStatuses,
+    useFriendStatuses,
+} from '@/components/common/friend-status/use-friend-statuses';
+export {
     emptySlotColor,
     ringColorMap,
     type RingColor,
