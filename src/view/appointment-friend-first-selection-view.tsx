@@ -207,10 +207,16 @@ function getCurrentWeekDates() {
 }
 
 function toLocalDateTimeString(date: Date, time: number) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(Math.floor(time) % 24).padStart(2, '0');
+    const normalizedDate = new Date(date);
+    if (time >= 24) {
+        normalizedDate.setDate(normalizedDate.getDate() + Math.floor(time / 24));
+    }
+
+    const normalizedTime = time % 24;
+    const year = normalizedDate.getFullYear();
+    const month = String(normalizedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(normalizedDate.getDate()).padStart(2, '0');
+    const hour = String(Math.floor(normalizedTime)).padStart(2, '0');
     const minute = time % 1 === 0 ? '00' : '30';
 
     return `${year}-${month}-${day}T${hour}:${minute}:00`;
