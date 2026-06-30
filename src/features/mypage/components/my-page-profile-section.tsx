@@ -21,7 +21,7 @@ export function MyPageProfileSection({ profile, onEdit }: MyPageProfileSectionPr
 
             <div className="min-w-0 flex-1">
                 <h2 className="truncate font-display text-[20px] leading-7 text-relink-ink">{profile.name}</h2>
-                <p className="mt-1 truncate font-display text-sm text-relink-gray-400">{profile.bio}</p>
+                <p className="mt-1 truncate font-display text-md text-relink-gray-400">{profile.bio}</p>
             </div>
 
             <button
