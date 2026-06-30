@@ -8,7 +8,7 @@ import {
 } from '@/components/common/friend-status';
 import type { FriendListItem, FriendListProps } from '@/features/friends/types';
 
-const FRIEND_PAGE_SIZE = 20;
+const FRIEND_PAGE_SIZE = 10;
 
 function FriendListRow({ friend }: { friend: FriendListItem }) {
     return (
@@ -17,6 +17,7 @@ function FriendListRow({ friend }: { friend: FriendListItem }) {
                 slots={friend.slots}
                 isActive={friend.isActive}
                 activeColor={friend.activeColor}
+                imageUrl={friend.imageUrl}
             />
 
             <div className="min-w-0 flex-1">

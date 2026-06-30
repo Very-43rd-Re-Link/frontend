@@ -1,5 +1,4 @@
-import genericAvatarSvg from '@/assets/icons/generic-avatar.svg';
-import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
+import { GenericAvatar } from '@/components/common/nav/generic-avatar';
 import type { AppointmentFriend, AvailabilitySegmentStatus } from '@/features/schedule/components/appointment-friend-types';
 import { statusClassNames } from '@/features/schedule/components/appointment-friend-first-utils';
 
@@ -27,7 +26,7 @@ export function AppointmentFriendFirstRow({
                 aria-pressed={isSelected}
                 onClick={onToggle}
             />
-            <InlineSvgIcon svg={genericAvatarSvg} className="h-[54px] w-[54px]" />
+            <GenericAvatar size={54} imageUrl={friend.imageUrl} />
 
             <div className="min-w-0 pt-1">
                 <p className="truncate text-lg text-relink-gray-700">{friend.name}</p>

@@ -1,5 +1,4 @@
-import genericAvatarSvg from '@/assets/icons/generic-avatar.svg';
-import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
+import { GenericAvatar } from '@/components/common/nav/generic-avatar';
 import type { AppointmentFriend } from '@/features/schedule/components/appointment-friend-types';
 
 type SelectedFriendsPreviewCardProps = {
@@ -28,10 +27,9 @@ export function SelectedFriendsPreviewCard({ selectedFriends, onBack }: Selected
                             index > 1 ? 'opacity-30' : ''
                         }`}
                     >
-                        <InlineSvgIcon
-                            svg={genericAvatarSvg}
-                            className={`h-[38px] w-[38px] ${index < 2 ? 'rounded-full ring-2 ring-relink-lavender-intense' : ''}`}
-                        />
+                        <span className={index < 2 ? 'rounded-full ring-2 ring-relink-lavender-intense' : ''}>
+                            <GenericAvatar size={38} imageUrl={friend.imageUrl} />
+                        </span>
                         <p className="mt-1 truncate">{friend.name}</p>
                     </div>
                 ))}

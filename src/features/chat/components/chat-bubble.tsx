@@ -20,15 +20,27 @@ export function ChatBubble({ message }: ChatBubbleProps) {
     return (
         <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
             <div className={`flex max-w-[78%] flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                <p
-                    className={`rounded-2xl px-4 py-3 font-display text-md shadow-sm ${
-                        isMine
-                            ? 'rounded-br-md bg-relink-lavender-intense text-relink-white'
-                            : 'rounded-bl-md bg-relink-lavender-soft text-relink-ink'
-                    }`}
-                >
-                    {message.text}
-                </p>
+                <div className="flex max-w-full flex-col gap-2">
+                    {message.attachments?.map((attachment) => (
+                        <img
+                            key={attachment.id}
+                            src={attachment.imageUrl}
+                            alt=""
+                            className="max-h-72 max-w-full rounded-2xl object-cover shadow-sm"
+                        />
+                    ))}
+                    {message.text ? (
+                        <p
+                            className={`rounded-2xl px-4 py-3 font-display text-md shadow-sm ${
+                                isMine
+                                    ? 'rounded-br-md bg-relink-lavender-intense text-relink-white'
+                                    : 'rounded-bl-md bg-relink-lavender-soft text-relink-ink'
+                            }`}
+                        >
+                            {message.text}
+                        </p>
+                    ) : null}
+                </div>
                 <span className="mt-1 px-1 font-display text-[11px] leading-4 text-relink-gray-400">
                     {message.time}
                 </span>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { activateLightning } from '@/api/friends';
 import { LightningCompleteToast, LightningSetupDialog } from '@/components/common/lightning-setup-dialog';
 import { routePaths } from '@/constants/route-paths';
 
@@ -54,6 +55,7 @@ export function FloatingAddButton({ placement = 'screen' }: FloatingAddButtonPro
     const [isHelpOpen, setIsHelpOpen] = useState(false);
     const [isLightningSetupOpen, setIsLightningSetupOpen] = useState(false);
     const [isLightningCompleteVisible, setIsLightningCompleteVisible] = useState(false);
+    const [isLightningSubmitting, setIsLightningSubmitting] = useState(false);
     const classNames = placementClassNames[placement];
 
     useEffect(() => {
@@ -93,6 +95,19 @@ export function FloatingAddButton({ placement = 'screen' }: FloatingAddButtonPro
 
         if (kind === 'group') {
             navigate(routePaths.appointmentGroups);
+        }
+    };
+
+    const handleLightningComplete = async (expiresAt: Date) => {
+        setIsLightningSubmitting(true);
+
+        try {
+            await activateLightning(expiresAt);
+            window.dispatchEvent(new CustomEvent('relink:lightning-updated'));
+            setIsLightningSetupOpen(false);
+            setIsLightningCompleteVisible(true);
+        } finally {
+            setIsLightningSubmitting(false);
         }
     };
 
@@ -183,10 +198,8 @@ export function FloatingAddButton({ placement = 'screen' }: FloatingAddButtonPro
             {isLightningSetupOpen ? (
                 <LightningSetupDialog
                     className={classNames.menu}
-                    onComplete={() => {
-                        setIsLightningSetupOpen(false);
-                        setIsLightningCompleteVisible(true);
-                    }}
+                    isSubmitting={isLightningSubmitting}
+                    onComplete={handleLightningComplete}
                 />
             ) : null}
 

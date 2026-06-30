@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     fetchFriendStatuses,
@@ -13,6 +13,7 @@ type StatusTarget = {
     slots: RingSlots;
     isActive?: boolean;
     activeColor?: string;
+    imageUrl?: string | null;
     status?: string;
 };
 
@@ -24,6 +25,28 @@ export function useFriendStatuses() {
     const resetStatuses = useCallback(() => {
         loadedMemberIdsRef.current = new Set();
         setStatusMap(new Map());
+    }, []);
+
+    const refreshLoadedStatuses = useCallback(async () => {
+        const loadedMemberIds = Array.from(loadedMemberIdsRef.current).slice(0, STATUS_BATCH_SIZE);
+
+        if (loadedMemberIds.length === 0) {
+            return;
+        }
+
+        setIsLoadingStatuses(true);
+        try {
+            const nextStatusMap = await fetchFriendStatuses(loadedMemberIds);
+            setStatusMap((currentStatusMap) => {
+                const mergedStatusMap = new Map(currentStatusMap);
+                nextStatusMap.forEach((status, memberId) => {
+                    mergedStatusMap.set(memberId, status);
+                });
+                return mergedStatusMap;
+            });
+        } finally {
+            setIsLoadingStatuses(false);
+        }
     }, []);
 
     const loadNextStatuses = useCallback(async (memberIds: number[]) => {
@@ -52,10 +75,23 @@ export function useFriendStatuses() {
         }
     }, []);
 
+    useEffect(() => {
+        const handleLightningUpdated = () => {
+            void refreshLoadedStatuses();
+        };
+
+        window.addEventListener('relink:lightning-updated', handleLightningUpdated);
+
+        return () => {
+            window.removeEventListener('relink:lightning-updated', handleLightningUpdated);
+        };
+    }, [refreshLoadedStatuses]);
+
     return {
         statusMap,
         isLoadingStatuses,
         loadNextStatuses,
+        refreshLoadedStatuses,
         resetStatuses,
     };
 }

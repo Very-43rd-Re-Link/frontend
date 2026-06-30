@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import genericAvatarSvg from '@/assets/icons/generic-avatar.svg';
-import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
+import { createAppointment } from '@/api/appointments';
+import { GenericAvatar } from '@/components/common/nav/generic-avatar';
 import { routePaths } from '@/constants/route-paths';
 import type { AppointmentFriend } from '@/features/schedule/components/appointment-friend-types';
 import type { AppointmentSelection } from '@/features/schedule/types';
@@ -25,19 +25,41 @@ export function AppointmentProposalReview({
     const [customActivity, setCustomActivity] = useState('');
     const [inviteLink, setInviteLink] = useState<string | null>(null);
     const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const isRequiredSelectionComplete = Boolean(selectedActivity || customActivity.trim());
 
     const openInviteLinkDialog = () => {
         setInviteLink(createTemporaryInviteLink());
     };
 
-    const handleBottomButtonClick = () => {
+    const handleBottomButtonClick = async () => {
         if (!isRequiredSelectionComplete) {
             onBack();
             return;
         }
 
-        setIsCompleteDialogOpen(true);
+        const participantMemberIds = selectedFriends
+            .map((friend) => friend.memberId)
+            .filter((memberId): memberId is number => typeof memberId === 'number');
+
+        if (!selection.startAt || !selection.endAt || participantMemberIds.length === 0) {
+            setIsCompleteDialogOpen(true);
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await createAppointment({
+                title: selectedActivity ?? customActivity.trim(),
+                startAt: selection.startAt,
+                endAt: selection.endAt,
+                memo: '',
+                participantMemberIds,
+            });
+            setIsCompleteDialogOpen(true);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -73,9 +95,10 @@ export function AppointmentProposalReview({
                         ? 'bg-relink-lavender-intense text-relink-white'
                         : 'bg-relink-lavender-soft text-relink-gray-700'
                 }`}
+                disabled={isSubmitting}
                 onClick={handleBottomButtonClick}
             >
-                {isRequiredSelectionComplete ? '확인' : '되돌아가기'}
+                {isSubmitting ? '저장하는 중' : isRequiredSelectionComplete ? '확인' : '되돌아가기'}
             </button>
 
             {inviteLink ? (
@@ -184,7 +207,7 @@ function AppointmentProposalCompleteDialog({ onMoveToChat }: { onMoveToChat: () 
 function SelectedFriendAvatar({ friend }: { friend: AppointmentFriend }) {
     return (
         <div className="flex w-[58px] shrink-0 flex-col items-center text-center text-sm text-relink-gray-700">
-            <InlineSvgIcon svg={genericAvatarSvg} className="h-[48px] w-[48px]" />
+            <GenericAvatar size={48} imageUrl={friend.imageUrl} />
             <p className="mt-1.5 truncate">{friend.name}</p>
         </div>
     );

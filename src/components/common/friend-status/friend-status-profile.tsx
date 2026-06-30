@@ -7,6 +7,7 @@ type FriendStatusProfileProps = {
     slots: RingSlots;
     isActive?: boolean;
     activeColor?: string;
+    imageUrl?: string | null;
     size?: number;
 };
 
@@ -14,6 +15,7 @@ export function FriendStatusProfile({
     slots,
     isActive = false,
     activeColor = '#66f2f6',
+    imageUrl,
     size = 64,
 }: FriendStatusProfileProps) {
     const avatarSize = Math.round(size * 0.72);
@@ -22,7 +24,7 @@ export function FriendStatusProfile({
     return (
         <div className="relative shrink-0" style={{ width: size, height: size }}>
             <FriendStatusRing slots={slots} size={size}>
-                <GenericAvatar size={avatarSize} />
+                <GenericAvatar size={avatarSize} imageUrl={imageUrl} />
             </FriendStatusRing>
             {isActive && (
                 <div

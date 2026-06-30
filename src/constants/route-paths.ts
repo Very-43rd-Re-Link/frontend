@@ -14,5 +14,6 @@ export const routePaths = {
     chatAll: '/chat/all',
     chatRoomPattern: '/chat/rooms/:roomId',
     chatRoom: (roomId: string) => `/chat/rooms/${roomId}`,
+    notifications: '/notifications',
     mypage: '/mypage',
 } as const;

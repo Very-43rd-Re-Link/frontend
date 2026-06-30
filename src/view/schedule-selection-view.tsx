@@ -205,6 +205,7 @@ export function ScheduleSelectionView({
                 setAppointmentSelection({
                     slotKeys: currentSelection.slotKeys,
                     label: formatAppointmentSelectionLabel(currentSelection.slotKeys, weekDates),
+                    ...toAppointmentDateTimeRange(currentSelection.slotKeys, weekDates),
                 });
             }
 
@@ -337,4 +338,33 @@ function formatHour(time: number) {
     const minute = time % 1 === 0 ? '00' : '30';
 
     return `${String(hour).padStart(2, '0')}:${minute}`;
+}
+
+function toAppointmentDateTimeRange(slotKeys: string[], weekDates: Date[]) {
+    const slots = slotKeys
+        .map((slotKey) => {
+            const [dayIndex, time] = slotKey.split('-').map(Number);
+
+            return { dayIndex, time };
+        })
+        .sort((first, second) => first.dayIndex - second.dayIndex || first.time - second.time);
+    const firstSlot = slots[0];
+    const sameDaySlots = slots.filter((slot) => slot.dayIndex === firstSlot.dayIndex);
+    const startTime = Math.min(...sameDaySlots.map((slot) => slot.time));
+    const endTime = Math.max(...sameDaySlots.map((slot) => slot.time)) + 0.5;
+
+    return {
+        startAt: toLocalDateTimeString(weekDates[firstSlot.dayIndex], startTime),
+        endAt: toLocalDateTimeString(weekDates[firstSlot.dayIndex], endTime),
+    };
+}
+
+function toLocalDateTimeString(date: Date, time: number) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(Math.floor(time) % 24).padStart(2, '0');
+    const minute = time % 1 === 0 ? '00' : '30';
+
+    return `${year}-${month}-${day}T${hour}:${minute}:00`;
 }

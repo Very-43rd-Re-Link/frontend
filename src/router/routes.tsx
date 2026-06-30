@@ -12,6 +12,7 @@ import { HomeScreen } from '@/view/home-screen';
 import { InviteAcceptanceView } from '@/view/invite-acceptance-view';
 import { LoginView } from '@/view/login-view';
 import { MyPageView } from '@/view/my-page-view';
+import { NotificationInboxView } from '@/view/notification-inbox-view';
 import { AppointmentScheduleSelectionView, ScheduleSelectionView } from '@/view/schedule-selection-view';
 
 export function AppRoutes() {
@@ -126,6 +127,14 @@ export function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <ChatRoomView />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path={routePaths.notifications}
+                element={
+                    <ProtectedRoute>
+                        <NotificationInboxView />
                     </ProtectedRoute>
                 }
             />

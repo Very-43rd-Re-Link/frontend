@@ -15,6 +15,7 @@ export function ChatRoomAvatar({ room }: ChatRoomAvatarProps) {
                 slots={room.slots ?? ['green', null, 'green', null]}
                 isActive={room.isActive}
                 activeColor={room.activeColor}
+                imageUrl={room.imageUrl}
                 size={70}
             />
         );

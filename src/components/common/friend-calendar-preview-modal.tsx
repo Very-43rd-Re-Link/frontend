@@ -11,6 +11,7 @@ export type FriendCalendarPreviewBlock = {
 
 type FriendCalendarPreviewModalProps = {
     friendNames: string[];
+    blocks?: FriendCalendarPreviewBlock[];
     onClose: () => void;
 };
 
@@ -69,9 +70,9 @@ export const multipleStatusClassNames: Record<PreviewSlotStatus, string> = {
     available: 'bg-relink-scheduleGreen',
 };
 
-export function FriendCalendarPreviewModal({ friendNames, onClose }: FriendCalendarPreviewModalProps) {
+export function FriendCalendarPreviewModal({ friendNames, blocks: providedBlocks, onClose }: FriendCalendarPreviewModalProps) {
     const isMultiple = friendNames.length > 1;
-    const blocks = isMultiple ? multipleFriendBlocks : singleFriendBlocks;
+    const blocks = providedBlocks ?? (isMultiple ? multipleFriendBlocks : singleFriendBlocks);
     const statusClassNames = isMultiple ? multipleStatusClassNames : singleStatusClassNames;
     const title = isMultiple ? `${friendNames.length}명 친구 캘린더` : `${friendNames[0]} 캘린더`;
 

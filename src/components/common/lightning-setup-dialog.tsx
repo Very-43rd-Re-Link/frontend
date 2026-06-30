@@ -5,7 +5,8 @@ import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
 
 type LightningSetupDialogProps = {
     className: string;
-    onComplete: () => void;
+    isSubmitting?: boolean;
+    onComplete: (expiresAt: Date) => void;
 };
 
 type LightningCompleteToastProps = {
@@ -15,16 +16,20 @@ type LightningCompleteToastProps = {
 const timeItemHeight = 32;
 const initialSelectedTimeIndex = 2;
 
-export function LightningSetupDialog({ className, onComplete }: LightningSetupDialogProps) {
+export function LightningSetupDialog({
+    className,
+    isSubmitting = false,
+    onComplete,
+}: LightningSetupDialogProps) {
     const timeOptions = useMemo(() => createThirtyMinuteTimeOptions(), []);
-    const [selectedIndex, setSelectedIndex] = useState(initialSelectedTimeIndex);
+    const [selectedIndex, setSelectedIndex] = useState(Math.min(initialSelectedTimeIndex, timeOptions.length - 1));
     const selectedTime = timeOptions[selectedIndex];
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         scrollRef.current?.scrollTo({
-            top: initialSelectedTimeIndex * timeItemHeight,
-            behavior: 'instant',
+            top: selectedIndex * timeItemHeight,
+            behavior: 'auto',
         });
     }, []);
 
@@ -44,31 +49,31 @@ export function LightningSetupDialog({ className, onComplete }: LightningSetupDi
 
     return (
         <section
-            className={`relink-float-menu ${className} z-40 w-[620px] max-w-[calc(100vw-40px)] origin-bottom-right rounded-xl bg-relink-white px-5 py-5 font-display shadow-relink-card`}
+            className={`relink-float-menu ${className} z-40 w-[324px] max-w-[calc(100vw-40px)] origin-bottom-right rounded-xl bg-relink-white px-5 py-5 font-display shadow-relink-card`}
         >
             <h2 className="text-xl text-relink-gray-700">번개 설정</h2>
 
-            <div className="mt-6 grid grid-cols-[minmax(92px,1fr)_28px_minmax(118px,1fr)] items-center gap-3">
-                <div className="flex h-[76px] items-center justify-center rounded bg-relink-lavender-soft text-xl text-relink-ink">
+            <div className="mt-6 grid grid-cols-[92px_20px_minmax(126px,1fr)] items-center gap-2">
+                <div className="relative z-10 flex h-[72px] items-center justify-center rounded bg-relink-lavender-soft text-xl text-relink-ink">
                     지금
                 </div>
 
                 <div className="text-center text-xl text-relink-gray-700">~</div>
 
-                <div className="relative h-[104px] overflow-hidden">
+                <div className="relative h-[112px] min-w-0 overflow-hidden">
                     <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-[38px] -translate-y-1/2 rounded bg-relink-lavender-soft" />
                     <div
                         ref={scrollRef}
-                        className="relink-hidden-scrollbar relative h-full snap-y snap-mandatory overflow-y-auto"
+                        className="relink-hidden-scrollbar relative h-full touch-pan-y snap-y snap-mandatory overflow-y-auto overscroll-contain"
                         onScroll={handleScroll}
                     >
-                        <div style={{ height: 36 }} aria-hidden="true" />
+                        <div style={{ height: 40 }} aria-hidden="true" />
                         {timeOptions.map((time, index) => {
                             const distance = Math.abs(index - selectedIndex);
 
                             return (
                                 <button
-                                    key={time}
+                                    key={time.label}
                                     type="button"
                                     className={`flex h-8 w-full snap-center items-center justify-center bg-transparent px-1 text-lg leading-8 transition-colors ${
                                         distance === 0
@@ -79,11 +84,11 @@ export function LightningSetupDialog({ className, onComplete }: LightningSetupDi
                                     }`}
                                     onClick={() => handleTimeClick(index)}
                                 >
-                                    {time}
+                                    {time.label}
                                 </button>
                             );
                         })}
-                        <div style={{ height: 36 }} aria-hidden="true" />
+                        <div style={{ height: 40 }} aria-hidden="true" />
                     </div>
 
                     <div className="pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-relink-white to-transparent" />
@@ -93,14 +98,15 @@ export function LightningSetupDialog({ className, onComplete }: LightningSetupDi
 
             <button
                 type="button"
-                className="mt-6 flex h-[64px] w-full items-center justify-center gap-3 rounded bg-relink-lavender-soft text-lg text-relink-ink transition-transform active:scale-[0.98]"
-                onClick={onComplete}
+                disabled={isSubmitting}
+                className="mt-6 flex h-[64px] w-full items-center justify-center gap-3 rounded bg-relink-lavender-soft text-lg text-relink-ink transition-transform active:scale-[0.98] disabled:opacity-60"
+                onClick={() => onComplete(selectedTime.expiresAt)}
             >
                 <InlineSvgIcon svg={lightningSvg} className="h-8 w-6" />
-                <span>번개 설정 완료하기</span>
+                <span>{isSubmitting ? '번개 설정 중...' : '번개 설정 완료하기'}</span>
             </button>
 
-            <p className="sr-only">선택한 종료 시간은 {selectedTime}입니다.</p>
+            <p className="sr-only">선택한 종료 시간은 {selectedTime.label}입니다.</p>
         </section>
     );
 }
@@ -124,7 +130,10 @@ function createThirtyMinuteTimeOptions() {
     return Array.from({ length: 18 }, (_, index) => {
         const optionDate = new Date(startDate);
         optionDate.setMinutes(startDate.getMinutes() + index * 30);
-        return formatKoreanTime(optionDate);
+        return {
+            label: formatKoreanTime(optionDate),
+            expiresAt: optionDate,
+        };
     });
 }
 

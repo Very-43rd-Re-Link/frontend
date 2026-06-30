@@ -6,6 +6,7 @@ type FriendStatusItemProps = {
     slots: RingSlots;
     isActive?: boolean;
     activeColor?: string;
+    imageUrl?: string | null;
     onClick?: () => void;
 };
 
@@ -14,11 +15,17 @@ export function FriendStatusItem({
     slots,
     isActive = false,
     activeColor = '#66f2f6',
+    imageUrl,
     onClick,
 }: FriendStatusItemProps) {
     const itemContent = (
         <>
-            <FriendStatusProfile slots={slots} isActive={isActive} activeColor={activeColor} />
+            <FriendStatusProfile
+                slots={slots}
+                isActive={isActive}
+                activeColor={activeColor}
+                imageUrl={imageUrl}
+            />
             <p className="mt-[3px] text-center font-display text-sm text-relink-ink">{name}</p>
         </>
     );

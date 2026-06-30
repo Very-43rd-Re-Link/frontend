@@ -5,6 +5,8 @@ import type { ChatRoom, ChatTabKey } from '@/features/chat/types';
 type ChatListScreenProps = {
     rooms: ChatRoom[];
     tab: ChatTabKey;
+    isLoading?: boolean;
+    errorMessage?: string | null;
 };
 
 const tabFilters: Record<ChatTabKey, (room: ChatRoom) => boolean> = {
@@ -15,13 +17,23 @@ const tabFilters: Record<ChatTabKey, (room: ChatRoom) => boolean> = {
     all: () => true,
 };
 
-export function ChatListScreen({ rooms, tab }: ChatListScreenProps) {
+export function ChatListScreen({ rooms, tab, isLoading, errorMessage }: ChatListScreenProps) {
     const filteredRooms = rooms.filter(tabFilters[tab]);
 
     return (
         <div className="flex h-full min-h-0 flex-col bg-relink-white">
             <ChatHeader />
-            <ChatRoomList rooms={filteredRooms} />
+            {isLoading ? (
+                <p className="py-10 text-center font-display text-sm text-relink-gray-400">Loading...</p>
+            ) : errorMessage ? (
+                <p className="px-7 py-10 text-center font-display text-sm text-relink-gray-400">{errorMessage}</p>
+            ) : filteredRooms.length === 0 ? (
+                <div className="flex min-h-0 flex-1 items-center justify-center px-7">
+                    <p className="font-display text-lg text-relink-gray-400">채팅방이 없습니다</p>
+                </div>
+            ) : (
+                <ChatRoomList rooms={filteredRooms} />
+            )}
         </div>
     );
 }

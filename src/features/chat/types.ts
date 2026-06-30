@@ -9,6 +9,13 @@ export type ChatMessage = {
     sender: 'me' | 'other' | 'system';
     text: string;
     time: string;
+    attachments?: ChatAttachment[];
+};
+
+export type ChatAttachment = {
+    id: string;
+    imageUrl: string;
+    contentType: string;
 };
 
 export type ChatRoom = {
@@ -19,6 +26,7 @@ export type ChatRoom = {
     timeLabel: string;
     lastMessage: string;
     unreadCount?: number;
+    imageUrl?: string | null;
     slots?: RingSlots;
     isActive?: boolean;
     activeColor?: string;

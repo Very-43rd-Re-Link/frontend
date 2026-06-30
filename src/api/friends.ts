@@ -52,7 +52,7 @@ export type FriendStatusMap = Map<number, {
 export async function fetchFriends({
     keyword,
     page = 0,
-    size = 20,
+    size = 10,
 }: {
     keyword?: string;
     page?: number;
@@ -99,6 +99,12 @@ export async function fetchFriendStatuses(memberIds: number[]) {
 
         return statusMap;
     }, new Map());
+}
+
+export async function activateLightning(expiresAt: Date) {
+    await apiClient.post<void, { expiresAt: string }>('/friends/lightning', {
+        expiresAt: expiresAt.toISOString(),
+    });
 }
 
 function toFriendOverview(friend: FriendSummaryResponse): FriendOverview {

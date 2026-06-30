@@ -1,5 +1,5 @@
 import apiClient from '@/lib/api-client';
-import { saveAuthTokens } from '@/lib/auth-token-storage';
+import { clearAuthTokens, getRefreshToken, saveAuthTokens } from '@/lib/auth-token-storage';
 
 type SocialProvider = 'GOOGLE' | 'KAKAO';
 
@@ -33,6 +33,16 @@ export async function loginWithKakaoAccessToken(accessToken: string) {
         provider: 'KAKAO',
         accessToken,
     });
+}
+
+export async function logout() {
+    const refreshToken = getRefreshToken();
+
+    if (refreshToken) {
+        await apiClient.post<void, { refreshToken: string }>('/auth/logout', { refreshToken });
+    }
+
+    clearAuthTokens();
 }
 
 async function login(request: Omit<SocialLoginRequest, 'deviceId' | 'deviceName'>) {

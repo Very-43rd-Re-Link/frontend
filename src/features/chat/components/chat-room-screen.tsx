@@ -9,9 +9,11 @@ import type { ChatRoom } from '@/features/chat/types';
 
 type ChatRoomScreenProps = {
     room: ChatRoom;
+    isLoading?: boolean;
+    onSend: (payload: { text: string; imageFile?: File | null }) => Promise<void>;
 };
 
-export function ChatRoomScreen({ room }: ChatRoomScreenProps) {
+export function ChatRoomScreen({ room, isLoading, onSend }: ChatRoomScreenProps) {
     const navigate = useNavigate();
 
     return (
@@ -19,22 +21,22 @@ export function ChatRoomScreen({ room }: ChatRoomScreenProps) {
             <header className="flex shrink-0 items-center gap-3 border-b border-relink-card px-4 pb-4 pt-11 shadow-[0_1px_8px_rgba(205,208,255,0.32)]">
                 <button
                     type="button"
-                    aria-label="채팅 목록으로 돌아가기"
+                    aria-label="Back to chats"
                     className="flex h-10 w-10 items-center justify-center rounded-full font-sans text-3xl text-relink-lavender-intense"
                     onClick={() => navigate(-1)}
                 >
-                    ‹
+                    {'<'}
                 </button>
                 <ChatRoomAvatar room={room} />
                 <div className="min-w-0 flex-1">
                     <h1 className="truncate font-display text-[20px] leading-7 text-relink-ink">{room.name}</h1>
                     <p className="mt-0.5 font-display text-sm text-relink-gray-400">
-                        {room.kind === 'direct' ? '1:1 채팅' : `${room.memberCount ?? 1}명 참여 중`}
+                        {room.kind === 'direct' ? 'Direct chat' : `${room.memberCount ?? 1} members`}
                     </p>
                 </div>
                 <button
                     type="button"
-                    aria-label={`${room.name} 채팅방 설정`}
+                    aria-label={`${room.name} chat settings`}
                     className="flex h-10 w-10 items-center justify-center rounded-full"
                 >
                     <InlineSvgIcon svg={settingsSvg} className="h-[21px] w-[21px]" />
@@ -42,12 +44,16 @@ export function ChatRoomScreen({ room }: ChatRoomScreenProps) {
             </header>
 
             <main className="relink-hidden-scrollbar flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-5">
-                {room.messages.map((message) => (
-                    <ChatBubble key={message.id} message={message} />
-                ))}
+                {isLoading ? (
+                    <p className="py-8 text-center font-display text-sm text-relink-gray-400">Loading...</p>
+                ) : (
+                    room.messages.map((message) => (
+                        <ChatBubble key={message.id} message={message} />
+                    ))
+                )}
             </main>
 
-            <ChatComposer />
+            <ChatComposer onSend={onSend} />
         </div>
     );
 }

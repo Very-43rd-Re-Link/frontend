@@ -1,5 +1,4 @@
-import genericAvatarSvg from '@/assets/icons/generic-avatar.svg';
-import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
+import { GenericAvatar } from '@/components/common/nav/generic-avatar';
 import { AvailabilityBar } from '@/features/schedule/components/availability-bar';
 import type { AppointmentFriend } from '@/features/schedule/components/appointment-friend-types';
 
@@ -22,7 +21,7 @@ export function AppointmentFriendRow({ friend, isSelected, onToggle, onCalendarO
                 aria-pressed={isSelected}
                 onClick={onToggle}
             />
-            <InlineSvgIcon svg={genericAvatarSvg} className="h-[42px] w-[42px]" />
+            <GenericAvatar size={42} imageUrl={friend.imageUrl} />
 
             <div className="min-w-0">
                 <div className="flex min-w-0 items-center justify-between gap-1.5">

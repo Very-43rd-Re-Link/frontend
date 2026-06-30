@@ -14,4 +14,6 @@ export type ScheduledBlock = {
 export type AppointmentSelection = {
     slotKeys: string[];
     label: string;
+    startAt?: string;
+    endAt?: string;
 };
