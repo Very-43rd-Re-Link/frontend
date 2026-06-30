@@ -34,3 +34,7 @@
 - `android`, `ios`, `.expo`, `expo-env.d.ts` 등 native/prebuild 산출물은 새 구현에서 참조하거나 확장하지 않습니다.
 - 새 의존성 추가 전 기존 의존성으로 해결 가능한지 확인합니다.
 - 민감정보, 토큰, `.env` 값은 코드나 로그에 노출하지 않습니다.
+
+## Notes
+
+- Do not run verification commands unless the user explicitly asks for verification.

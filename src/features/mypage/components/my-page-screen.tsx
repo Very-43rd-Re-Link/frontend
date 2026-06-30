@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import type { UpdateMyProfileRequest } from '@/api/mypage';
-import { FloatingAddButton } from '@/components/common/floating-add-button';
 import { FriendSummaryCard } from '@/features/mypage/components/friend-summary-card';
 import { MyPageHeader } from '@/features/mypage/components/my-page-header';
 import { MyPageProfileSection } from '@/features/mypage/components/my-page-profile-section';
@@ -55,8 +54,6 @@ export function MyPageScreen({
                     }}
                 />
             ) : null}
-
-            <FloatingAddButton />
         </div>
     );
 }
