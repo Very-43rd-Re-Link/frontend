@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 
-import { fetchChatMessages, fetchChatRooms, sendChatMessage } from '@/api/chat';
+import { fetchChatMessages, fetchChatRooms, markChatRoomAsRead, sendChatMessage } from '@/api/chat';
 import { routePaths } from '@/constants/route-paths';
 import { ChatRoomScreen } from '@/features/chat/components/chat-room-screen';
 import type { ChatMessage, ChatRoom } from '@/features/chat/types';
 
 export function ChatRoomView() {
     const { roomId } = useParams();
+    const location = useLocation();
+    const routeState = location.state as {
+        fallbackRoomKind?: ChatRoom['kind'];
+        fallbackRoomName?: string;
+    } | null;
     const [room, setRoom] = useState<ChatRoom | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +25,7 @@ export function ChatRoomView() {
 
         const nextMessages = await fetchChatMessages(roomId);
         setMessages(nextMessages);
+        await markLatestMessageAsRead(roomId, nextMessages);
     }, [roomId]);
 
     useEffect(() => {
@@ -50,6 +56,7 @@ export function ChatRoomView() {
                 if (isMounted) {
                     setMessages(nextMessages);
                 }
+                await markLatestMessageAsRead(roomId, nextMessages);
             } catch {
                 if (isMounted) {
                     setNotFound(true);
@@ -74,8 +81,8 @@ export function ChatRoomView() {
 
     const roomWithMessages = room ?? {
         id: roomId,
-        kind: 'group' as const,
-        name: '',
+        kind: routeState?.fallbackRoomKind ?? 'group',
+        name: routeState?.fallbackRoomName ?? '대화방',
         timeLabel: '',
         lastMessage: '',
         messages,
@@ -91,4 +98,18 @@ export function ChatRoomView() {
             }}
         />
     );
+}
+
+async function markLatestMessageAsRead(roomId: string, messages: ChatMessage[]) {
+    const lastMessageId = messages.at(-1)?.id;
+
+    if (!lastMessageId || Number.isNaN(Number(lastMessageId))) {
+        return;
+    }
+
+    try {
+        await markChatRoomAsRead(roomId, lastMessageId);
+    } catch {
+        // 읽음 처리 실패가 채팅방 입장을 막지는 않게 둡니다.
+    }
 }

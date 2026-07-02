@@ -4,7 +4,7 @@ import type { ChatMessage, ChatRoom } from '@/features/chat/types';
 import apiClient, { api } from '@/lib/api-client';
 import { getAccessToken } from '@/lib/auth-token-storage';
 
-type ApiRoomType = 'DIRECT' | 'GROUP';
+type ApiRoomType = 'DIRECT' | 'GROUP' | 'APPOINTMENT';
 type ApiMessageType = 'TEXT' | 'IMAGE' | 'SYSTEM';
 
 type ChatRoomSummaryResponse = {
@@ -21,6 +21,14 @@ type ChatRoomSummaryResponse = {
 
 type ChatRoomsResponse = {
     rooms: ChatRoomSummaryResponse[];
+};
+
+type ChatRoomParticipantsResponse = {
+    participants: {
+        memberId: number;
+        name: string;
+        imageUrl: string | null;
+    }[];
 };
 
 type ChatMessageAttachmentResponse = {
@@ -67,10 +75,57 @@ type SendChatMessageResponse = {
     createdAt: string;
 };
 
+type CreateChatRoomResponse = {
+    roomId: number;
+    roomType: ApiRoomType;
+};
+
+type MarkChatRoomAsReadResponse = {
+    roomId: number;
+    memberId: number;
+    lastReadMessageId: number;
+    lastReadAt: string;
+};
+
 export async function fetchChatRooms() {
     const response = await apiClient.get<ChatRoomsResponse>('/chat/rooms');
 
     return response.rooms.map(toChatRoom);
+}
+
+export async function createDirectChatRoom(targetMemberId: number) {
+    const response = await apiClient.post<CreateChatRoomResponse, { targetMemberId: number }>(
+        '/chat/rooms/direct',
+        { targetMemberId },
+    );
+
+    return String(response.roomId);
+}
+
+export async function createGroupChatRoom({
+    title,
+    participantMemberIds,
+}: {
+    title: string;
+    participantMemberIds: number[];
+}) {
+    const response = await apiClient.post<CreateChatRoomResponse, {
+        title: string;
+        participantMemberIds: number[];
+        coverImageKey: string | null;
+    }>('/chat/rooms/group', {
+        title,
+        participantMemberIds,
+        coverImageKey: null,
+    });
+
+    return String(response.roomId);
+}
+
+export async function fetchChatRoomParticipants(roomId: string) {
+    const response = await apiClient.get<ChatRoomParticipantsResponse>(`/chat/rooms/${roomId}/participants`);
+
+    return response.participants;
 }
 
 export async function fetchChatMessages(roomId: string) {
@@ -80,6 +135,13 @@ export async function fetchChatMessages(roomId: string) {
     });
 
     return response.messages.map((message) => toChatMessage(message, currentMemberId));
+}
+
+export async function markChatRoomAsRead(roomId: string, lastReadMessageId: string) {
+    return apiClient.patch<MarkChatRoomAsReadResponse, { lastReadMessageId: number }>(
+        `/chat/rooms/${roomId}/read`,
+        { lastReadMessageId: Number(lastReadMessageId) },
+    );
 }
 
 export async function sendChatMessage({
@@ -144,8 +206,8 @@ async function uploadAttachment(uploadUrl: string, file: File) {
 function toChatRoom(room: ChatRoomSummaryResponse): ChatRoom {
     return {
         id: String(room.roomId),
-        kind: room.roomType === 'DIRECT' ? 'direct' : 'group',
-        name: room.displayName || room.title || 'Chat',
+        kind: toChatRoomKind(room.roomType),
+        name: toRoomName(room),
         imageUrl: room.coverImageUrl,
         timeLabel: formatTimeLabel(room.lastMessageAt),
         lastMessage: toLastMessage(room.lastMessage, room.lastMessageType),
@@ -162,7 +224,7 @@ function toChatMessage(message: ChatMessageResponse, currentMemberId: number | n
             : message.senderId === currentMemberId
                 ? 'me'
                 : 'other',
-        text: message.textContent || (message.messageType === 'IMAGE' ? 'Photo' : ''),
+        text: message.textContent || (message.messageType === 'IMAGE' ? '사진' : ''),
         time: formatTimeLabel(message.createdAt),
         attachments: message.attachments
             .filter((attachment) => attachment.imageUrl)
@@ -174,12 +236,34 @@ function toChatMessage(message: ChatMessageResponse, currentMemberId: number | n
     };
 }
 
+function toRoomName(room: ChatRoomSummaryResponse) {
+    const fallbackName = room.roomType === 'DIRECT'
+        ? '1:1 대화'
+        : room.roomType === 'APPOINTMENT'
+            ? '약속방'
+            : '그룹 대화';
+
+    return room.displayName?.trim() || room.title?.trim() || fallbackName;
+}
+
+function toChatRoomKind(roomType: ApiRoomType): ChatRoom['kind'] {
+    if (roomType === 'DIRECT') {
+        return 'direct';
+    }
+
+    if (roomType === 'APPOINTMENT') {
+        return 'appointment';
+    }
+
+    return 'group';
+}
+
 function toLastMessage(lastMessage: string | null, messageType: ApiMessageType | null) {
     if (lastMessage) {
         return lastMessage;
     }
     if (messageType === 'IMAGE') {
-        return 'Photo';
+        return '사진';
     }
     return '';
 }

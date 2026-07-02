@@ -1,6 +1,11 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { ChatHeader } from '@/features/chat/components/chat-header';
+import { ChatGroupCreateDialog } from '@/features/chat/components/chat-group-create-dialog';
 import { ChatRoomList } from '@/features/chat/components/chat-room-list';
 import type { ChatRoom, ChatTabKey } from '@/features/chat/types';
+import { routePaths } from '@/constants/route-paths';
 
 type ChatListScreenProps = {
     rooms: ChatRoom[];
@@ -18,13 +23,15 @@ const tabFilters: Record<ChatTabKey, (room: ChatRoom) => boolean> = {
 };
 
 export function ChatListScreen({ rooms, tab, isLoading, errorMessage }: ChatListScreenProps) {
+    const navigate = useNavigate();
+    const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
     const filteredRooms = rooms.filter(tabFilters[tab]);
 
     return (
-        <div className="flex h-full min-h-0 flex-col bg-relink-white">
-            <ChatHeader />
+        <div className="relative flex h-full min-h-0 flex-col bg-relink-white">
+            <ChatHeader onCreateGroup={() => setIsCreateGroupOpen(true)} />
             {isLoading ? (
-                <p className="py-10 text-center font-display text-sm text-relink-gray-400">Loading...</p>
+                <p className="py-10 text-center font-display text-sm text-relink-gray-400">채팅방을 불러오는 중</p>
             ) : errorMessage ? (
                 <p className="px-7 py-10 text-center font-display text-sm text-relink-gray-400">{errorMessage}</p>
             ) : filteredRooms.length === 0 ? (
@@ -34,6 +41,19 @@ export function ChatListScreen({ rooms, tab, isLoading, errorMessage }: ChatList
             ) : (
                 <ChatRoomList rooms={filteredRooms} />
             )}
+            <ChatGroupCreateDialog
+                isOpen={isCreateGroupOpen}
+                onClose={() => setIsCreateGroupOpen(false)}
+                onCreated={(roomId, roomName) => {
+                    setIsCreateGroupOpen(false);
+                    navigate(routePaths.chatRoom(roomId), {
+                        state: {
+                            fallbackRoomKind: 'group',
+                            fallbackRoomName: roomName,
+                        },
+                    });
+                }}
+            />
         </div>
     );
 }

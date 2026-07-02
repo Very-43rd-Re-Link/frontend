@@ -23,7 +23,9 @@ export function AppointmentGroupRow({ group, isSelected, onSelect }: Appointment
             <span className="min-w-0">
                 <span className="flex items-center gap-4">
                     <span className="truncate text-lg text-relink-ink">{group.name}</span>
-                    <span className="text-md text-relink-gray-400">{group.memberCount}</span>
+                    {typeof group.memberCount === 'number' ? (
+                        <span className="text-md text-relink-gray-400">{group.memberCount}</span>
+                    ) : null}
                 </span>
                 <span className="mt-2 flex min-w-0 items-center gap-3">
                     <span className="flex shrink-0 -space-x-1" aria-hidden="true">

@@ -3,14 +3,14 @@ import type { AppointmentFriend } from '@/features/schedule/components/appointme
 
 type AppointmentFriendFirstListProps = {
     friends: AppointmentFriend[];
-    selectedFriendNames: string[];
-    onFriendToggle: (friendName: string) => void;
-    onCalendarOpen: (friendName: string) => void;
+    selectedFriendIds: number[];
+    onFriendToggle: (memberId: number) => void;
+    onCalendarOpen: (memberId: number) => void;
 };
 
 export function AppointmentFriendFirstList({
     friends,
-    selectedFriendNames,
+    selectedFriendIds,
     onFriendToggle,
     onCalendarOpen,
 }: AppointmentFriendFirstListProps) {
@@ -18,11 +18,19 @@ export function AppointmentFriendFirstList({
         <section className="relink-hidden-scrollbar mt-7 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-7 pr-3">
             {friends.map((friend) => (
                 <AppointmentFriendFirstRow
-                    key={friend.name}
+                    key={friend.memberId ?? friend.name}
                     friend={friend}
-                    isSelected={selectedFriendNames.includes(friend.name)}
-                    onToggle={() => onFriendToggle(friend.name)}
-                    onCalendarOpen={() => onCalendarOpen(friend.name)}
+                    isSelected={typeof friend.memberId === 'number' && selectedFriendIds.includes(friend.memberId)}
+                    onToggle={() => {
+                        if (typeof friend.memberId === 'number') {
+                            onFriendToggle(friend.memberId);
+                        }
+                    }}
+                    onCalendarOpen={() => {
+                        if (typeof friend.memberId === 'number') {
+                            onCalendarOpen(friend.memberId);
+                        }
+                    }}
                 />
             ))}
         </section>

@@ -23,13 +23,17 @@ export function AppointmentProposalReview({
     const navigate = useNavigate();
     const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
     const [customActivity, setCustomActivity] = useState('');
-    const [inviteLink, setInviteLink] = useState<string | null>(null);
+    const [createdInviteLink, setCreatedInviteLink] = useState<string | null>(null);
+    const [inviteSheetLink, setInviteSheetLink] = useState<string | null>(null);
+    const [createdChatRoomId, setCreatedChatRoomId] = useState<string | null>(null);
     const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isRequiredSelectionComplete = Boolean(selectedActivity || customActivity.trim());
 
     const openInviteLinkDialog = () => {
-        setInviteLink(createTemporaryInviteLink());
+        if (createdInviteLink) {
+            setInviteSheetLink(createdInviteLink);
+        }
     };
 
     const handleBottomButtonClick = async () => {
@@ -49,13 +53,15 @@ export function AppointmentProposalReview({
 
         setIsSubmitting(true);
         try {
-            await createAppointment({
+            const appointment = await createAppointment({
                 title: selectedActivity ?? customActivity.trim(),
                 startAt: selection.startAt,
                 endAt: selection.endAt,
                 memo: '',
                 participantMemberIds,
             });
+            setCreatedChatRoomId(appointment.chatRoomId ? String(appointment.chatRoomId) : null);
+            setCreatedInviteLink(toAbsoluteInviteLink(appointment.inviteLink));
             setIsCompleteDialogOpen(true);
         } finally {
             setIsSubmitting(false);
@@ -101,12 +107,28 @@ export function AppointmentProposalReview({
                 {isSubmitting ? '저장하는 중' : isRequiredSelectionComplete ? '확인' : '되돌아가기'}
             </button>
 
-            {inviteLink ? (
-                <ExternalFriendInviteSheet inviteLink={inviteLink} onClose={() => setInviteLink(null)} />
+            {inviteSheetLink ? (
+                <ExternalFriendInviteSheet inviteLink={inviteSheetLink} onClose={() => setInviteSheetLink(null)} />
             ) : null}
 
             {isCompleteDialogOpen ? (
-                <AppointmentProposalCompleteDialog onMoveToChat={() => navigate(routePaths.chat)} />
+                <AppointmentProposalCompleteDialog
+                    inviteLink={createdInviteLink}
+                    onInviteExternalFriend={() => createdInviteLink && setInviteSheetLink(createdInviteLink)}
+                    onMoveToChat={() => {
+                        if (createdChatRoomId) {
+                            navigate(routePaths.chatRoom(createdChatRoomId), {
+                                state: {
+                                    fallbackRoomKind: 'appointment',
+                                    fallbackRoomName: selectedActivity ?? customActivity.trim(),
+                                },
+                            });
+                            return;
+                        }
+
+                        navigate(routePaths.chatAppointments);
+                    }}
+                />
             ) : null}
         </main>
     );
@@ -182,7 +204,15 @@ function ExternalFriendInviteSheet({ inviteLink, onClose }: { inviteLink: string
     );
 }
 
-function AppointmentProposalCompleteDialog({ onMoveToChat }: { onMoveToChat: () => void }) {
+function AppointmentProposalCompleteDialog({
+    inviteLink,
+    onInviteExternalFriend,
+    onMoveToChat,
+}: {
+    inviteLink: string | null;
+    onInviteExternalFriend: () => void;
+    onMoveToChat: () => void;
+}) {
     return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/55 px-6">
             <section
@@ -192,9 +222,18 @@ function AppointmentProposalCompleteDialog({ onMoveToChat }: { onMoveToChat: () 
                 aria-label="약속 제안 전송 완료"
             >
                 <h2 className="text-xl text-relink-gray-700">약속 제안 전송 완료</h2>
+                {inviteLink ? (
+                    <button
+                        type="button"
+                        className="mt-7 h-[56px] w-full rounded-md bg-relink-lavender-soft text-md text-relink-gray-700 shadow-relink-card"
+                        onClick={onInviteExternalFriend}
+                    >
+                        앱 미사용 친구 초대 링크 보기
+                    </button>
+                ) : null}
                 <button
                     type="button"
-                    className="mt-10 h-[64px] w-full rounded-md bg-relink-white text-lg text-relink-gray-700 shadow-relink-card"
+                    className="mt-4 h-[64px] w-full rounded-md bg-relink-white text-lg text-relink-gray-700 shadow-relink-card"
                     onClick={onMoveToChat}
                 >
                     약속 방으로 이동하기
@@ -289,9 +328,14 @@ function TextLineCard({
     );
 }
 
-function createTemporaryInviteLink() {
-    const inviteToken = Math.random().toString(36).slice(2, 10);
-    const origin = window.location.origin;
+function toAbsoluteInviteLink(inviteLink: string | null) {
+    if (!inviteLink) {
+        return null;
+    }
 
-    return `${origin}/invite/${inviteToken}`;
+    if (/^https?:\/\//.test(inviteLink)) {
+        return inviteLink;
+    }
+
+    return `${window.location.origin}${inviteLink.startsWith('/') ? inviteLink : `/${inviteLink}`}`;
 }

@@ -4,6 +4,8 @@ import type {
 } from '@/components/common/friend-calendar-preview-modal';
 import type { AppointmentFriend } from '@/features/schedule/components/appointment-friend-types';
 
+const SLOT_DURATION = 0.5;
+
 export function toCalendarPreviewBlocks(friends: AppointmentFriend[]) {
     const calendars = friends.flatMap((friend) => (friend.calendar ? [friend.calendar] : []));
     if (calendars.length === 0) {
@@ -18,18 +20,22 @@ export function toCalendarPreviewBlocks(friends: AppointmentFriend[]) {
             day.slots.forEach((slot) => {
                 const start = parseTimeValue(slot.startTime);
                 const end = parseTimeValue(slot.endTime);
-                if (dayIndex < 0 || dayIndex > 6 || start < 8 || start >= 24) {
+                if (dayIndex < 0 || dayIndex > 6 || end <= 8 || start >= 24) {
                     return;
                 }
 
-                const key = `${dayIndex}-${start}-${end}`;
-                slotStatusMap.set(key, [...(slotStatusMap.get(key) ?? []), toPreviewSlotStatus(slot.status)]);
+                for (let time = Math.max(8, start); time < Math.min(24, end); time += SLOT_DURATION) {
+                    const slotStart = normalizeTimeValue(time);
+                    const slotEnd = normalizeTimeValue(time + SLOT_DURATION);
+                    const key = `${dayIndex}-${slotStart}-${slotEnd}`;
+                    slotStatusMap.set(key, [...(slotStatusMap.get(key) ?? []), toPreviewSlotStatus(slot.status)]);
+                }
             });
         });
     }
 
-    return mergePreviewBlocks(
-        [...slotStatusMap.entries()].map(([key, statuses]) => {
+    return [...slotStatusMap.entries()]
+        .map(([key, statuses]) => {
             const [dayIndex, start, end] = key.split('-').map(Number);
 
             return {
@@ -38,8 +44,8 @@ export function toCalendarPreviewBlocks(friends: AppointmentFriend[]) {
                 end,
                 status: combineStatuses(statuses),
             };
-        }),
-    );
+        })
+        .sort((first, second) => first.dayIndex - second.dayIndex || first.start - second.start);
 }
 
 export function getPreviewSlotStatus(
@@ -48,20 +54,6 @@ export function getPreviewSlotStatus(
     time: number,
 ) {
     return blocks?.find((block) => block.dayIndex === dayIndex && block.start <= time && time < block.end)?.status;
-}
-
-function mergePreviewBlocks(blocks: FriendCalendarPreviewBlock[]) {
-    return blocks
-        .sort((first, second) => first.dayIndex - second.dayIndex || first.start - second.start)
-        .reduce<FriendCalendarPreviewBlock[]>((merged, block) => {
-            const previous = merged[merged.length - 1];
-            if (previous && previous.dayIndex === block.dayIndex && previous.status === block.status && previous.end === block.start) {
-                previous.end = block.end;
-                return merged;
-            }
-
-            return [...merged, { ...block }];
-        }, []);
 }
 
 function combineStatuses(statuses: PreviewSlotStatus[]): PreviewSlotStatus {
@@ -101,4 +93,8 @@ function parseTimeValue(time: string) {
     const [hour = '0', minute = '0'] = time.split(':');
 
     return Number(hour) + Number(minute) / 60;
+}
+
+function normalizeTimeValue(time: number) {
+    return Math.round(time * 2) / 2;
 }

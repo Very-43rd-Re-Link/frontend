@@ -1,16 +1,29 @@
 import { useCallback, useEffect, useRef, useState, type UIEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { createDirectChatRoom } from '@/api/chat';
 import { fetchFriends } from '@/api/friends';
 import {
     applyFriendStatuses,
     FriendStatusProfile,
     useFriendStatuses,
 } from '@/components/common/friend-status';
+import { routePaths } from '@/constants/route-paths';
 import type { FriendListItem, FriendListProps } from '@/features/friends/types';
 
 const FRIEND_PAGE_SIZE = 10;
 
-function FriendListRow({ friend }: { friend: FriendListItem }) {
+function FriendListRow({
+    friend,
+    isChatDisabled,
+    isStartingChat,
+    onStartDirectChat,
+}: {
+    friend: FriendListItem;
+    isChatDisabled: boolean;
+    isStartingChat: boolean;
+    onStartDirectChat: (friend: FriendListItem) => void;
+}) {
     return (
         <article className="flex items-center gap-4">
             <FriendStatusProfile
@@ -28,9 +41,11 @@ function FriendListRow({ friend }: { friend: FriendListItem }) {
             <div className="flex shrink-0 gap-2">
                 <button
                     type="button"
-                    className="rounded-md bg-relink-lavender-soft px-4 py-2 font-display text-sm text-gray-700"
+                    className="rounded-md bg-relink-lavender-soft px-4 py-2 font-display text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isChatDisabled}
+                    onClick={() => onStartDirectChat(friend)}
                 >
-                    1:1 채팅
+                    {isStartingChat ? '이동 중' : '1:1 채팅'}
                 </button>
                 <button
                     type="button"
@@ -49,10 +64,13 @@ export function FriendList({
     referenceTime,
     onFriendsCountChange,
 }: FriendListProps) {
+    const navigate = useNavigate();
     const [friends, setFriends] = useState<FriendListItem[]>([]);
     const [page, setPage] = useState(0);
     const [hasNext, setHasNext] = useState(false);
     const [isLoadingFriends, setIsLoadingFriends] = useState(false);
+    const [startingChatMemberId, setStartingChatMemberId] = useState<number | null>(null);
+    const [chatErrorMessage, setChatErrorMessage] = useState('');
     const isLoadingFriendsRef = useRef(false);
     const {
         statusMap,
@@ -110,6 +128,25 @@ export function FriendList({
         }
     };
 
+    const handleStartDirectChat = useCallback(async (friend: FriendListItem) => {
+        setStartingChatMemberId(friend.memberId);
+        setChatErrorMessage('');
+
+        try {
+            const roomId = await createDirectChatRoom(friend.memberId);
+            navigate(routePaths.chatRoom(roomId), {
+                state: {
+                    fallbackRoomKind: 'direct',
+                    fallbackRoomName: friend.name,
+                },
+            });
+        } catch {
+            setChatErrorMessage('채팅방으로 이동하지 못했어요. 잠시 후 다시 시도해 주세요.');
+        } finally {
+            setStartingChatMemberId(null);
+        }
+    }, [navigate]);
+
     const friendsWithStatuses = applyFriendStatuses(friends, statusMap);
 
     return (
@@ -124,8 +161,18 @@ export function FriendList({
                 onScroll={handleScroll}
             >
                 {friendsWithStatuses.map((friend) => (
-                    <FriendListRow key={friend.memberId} friend={friend} />
+                    <FriendListRow
+                        key={friend.memberId}
+                        friend={friend}
+                        isChatDisabled={startingChatMemberId !== null}
+                        isStartingChat={startingChatMemberId === friend.memberId}
+                        onStartDirectChat={handleStartDirectChat}
+                    />
                 ))}
+
+                {chatErrorMessage && (
+                    <p className="font-display text-sm text-red-500">{chatErrorMessage}</p>
+                )}
 
                 {(isLoadingFriends || isLoadingStatuses) && (
                     <p className="font-display text-sm text-gray-400">

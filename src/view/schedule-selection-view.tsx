@@ -1,5 +1,6 @@
 import type { PointerEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import type { AppointmentFriend } from '@/features/schedule/components/appointment-friend-types';
 import { AppointmentProposalReview } from '@/features/schedule/components/appointment-proposal-review';
@@ -13,6 +14,7 @@ import {
     updateScheduleSlots,
     type ScheduleState,
 } from '@/api/schedule';
+import { routePaths } from '@/constants/route-paths';
 import {
     addDays,
     formatWeekTitle,
@@ -43,6 +45,7 @@ export function ScheduleSelectionView({
     showFloatingAction = true,
     mode = 'calendar',
 }: ScheduleSelectionViewProps) {
+    const navigate = useNavigate();
     const [baseDate, setBaseDate] = useState(() => new Date());
     const [scheduleState, setScheduleState] = useState<ScheduleState>(() => ({
         slotStatuses: {},
@@ -282,6 +285,7 @@ export function ScheduleSelectionView({
             isSaving={isSaving}
             onPointerCancel={() => updateDragSelection(null)}
             onPointerUp={handleSlotPointerUp}
+            onBack={mode === 'appointment' ? () => navigate(routePaths.home) : undefined}
             onPreviousWeek={() => changeWeek(-1)}
             onNextWeek={() => changeWeek(1)}
             onSlotClick={handleSlotClick}

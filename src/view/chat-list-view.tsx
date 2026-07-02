@@ -27,7 +27,7 @@ export function ChatListView({ tab }: ChatListViewProps) {
                 }
             } catch {
                 if (isMounted) {
-                    setErrorMessage('Failed to load chats.');
+                    setErrorMessage('채팅방을 불러오지 못했어요.');
                 }
             } finally {
                 if (isMounted) {

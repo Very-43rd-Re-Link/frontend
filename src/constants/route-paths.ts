@@ -8,6 +8,7 @@ export const routePaths = {
     invite: '/invite/:inviteToken',
     friends: '/friends',
     chat: '/chat',
+    chatGroup: '/chat/group',
     chatDirect: '/chat/direct',
     chatAppointments: '/chat/appointments',
     chatUnread: '/chat/unread',

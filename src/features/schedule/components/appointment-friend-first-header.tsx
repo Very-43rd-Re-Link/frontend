@@ -2,10 +2,21 @@ import settingsSvg from '@/assets/icons/settings.svg';
 import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
 import { HelpBadge } from '@/components/common/nav/help-badge';
 
-export function AppointmentFriendFirstHeader() {
+type AppointmentFriendFirstHeaderProps = {
+    onBack: () => void;
+};
+
+export function AppointmentFriendFirstHeader({ onBack }: AppointmentFriendFirstHeaderProps) {
     return (
         <header className="flex flex-none items-start justify-between gap-4">
             <div className="min-w-0">
+                <button
+                    type="button"
+                    className="mb-3 rounded-md bg-relink-lavender-soft px-3 py-1.5 text-sm text-relink-gray-700"
+                    onClick={onBack}
+                >
+                    뒤로
+                </button>
                 <h1 className="text-[31px] leading-[42px] text-relink-gray-700">
                     약속을 잡고 싶은 친구를
                     <br />

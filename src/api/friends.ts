@@ -1,5 +1,6 @@
 import type { RingSlots } from '@/components/common/friend-status';
 import type { FriendListItem, FriendOverview } from '@/features/friends/types';
+import type { AvailabilitySegmentStatus } from '@/features/schedule/components/appointment-friend-types';
 import apiClient from '@/lib/api-client';
 
 type ApiSlotStatus = 'UNAVAILABLE' | 'NEGOTIABLE' | 'AVAILABLE' | 'APPOINTMENT';
@@ -44,6 +45,10 @@ type FriendStatusSlotResponse = {
 
 export type FriendStatusMap = Map<number, {
     slots: RingSlots;
+    availability: AvailabilitySegmentStatus[];
+    availableSlotCount: number;
+    fromLabel: string;
+    toLabel: string;
     isActive?: boolean;
     activeColor?: string;
     status: string;
@@ -85,16 +90,24 @@ export async function fetchFriendStatuses(memberIds: number[]) {
         return new Map();
     }
 
+    const params = new URLSearchParams();
+    memberIds.slice(0, 10).forEach((memberId) => params.append('memberIds', String(memberId)));
+
     const response = await apiClient.get<FriendStatusListResponse>('/friends/status', {
-        params: { memberIds: memberIds.slice(0, 10).join(',') },
+        params,
     });
 
     return response.friends.reduce<FriendStatusMap>((statusMap, friend) => {
+        const availableSlotCount = friend.slots.filter(isAvailableSlot).length;
         statusMap.set(friend.memberId, {
             slots: friend.slots.map((slot) => toRingSlot(slot.status)),
+            availability: friend.slots.map((slot) => toAvailabilitySegmentStatus(slot.status, friend.active)),
+            availableSlotCount,
+            fromLabel: toTimeLabel(response.from),
+            toLabel: toTimeLabel(response.to),
             isActive: friend.active,
             activeColor: '#66f2f6',
-            status: toStatusText(friend.active, friend.slots),
+            status: toStatusText(friend.active, availableSlotCount),
         });
 
         return statusMap;
@@ -123,6 +136,19 @@ function toFriendListItem(friend: FriendSummaryResponse): FriendListItem {
     };
 }
 
+function toAvailabilitySegmentStatus(status: ApiSlotStatus, active: boolean): AvailabilitySegmentStatus {
+    switch (status) {
+        case 'AVAILABLE':
+            return active ? 'lightning' : 'available';
+        case 'NEGOTIABLE':
+            return 'adjustable';
+        case 'APPOINTMENT':
+        case 'UNAVAILABLE':
+        default:
+            return 'unavailable';
+    }
+}
+
 function toRingSlot(status: ApiSlotStatus): RingSlots[number] {
     switch (status) {
         case 'APPOINTMENT':
@@ -137,8 +163,11 @@ function toRingSlot(status: ApiSlotStatus): RingSlots[number] {
     }
 }
 
-function toStatusText(active: boolean, slots: FriendStatusSlotResponse[]) {
-    const availableSlotCount = slots.filter((slot) => slot.status !== 'UNAVAILABLE').length;
+function isAvailableSlot(slot: FriendStatusSlotResponse) {
+    return slot.status === 'AVAILABLE' || slot.status === 'NEGOTIABLE';
+}
+
+function toStatusText(active: boolean, availableSlotCount: number) {
     const minutes = availableSlotCount * 30;
     const hour = Math.floor(minutes / 60);
     const minute = minutes % 60;
@@ -148,4 +177,17 @@ function toStatusText(active: boolean, slots: FriendStatusSlotResponse[]) {
     ].filter(Boolean).join(' ') || '0분';
 
     return `${active ? '번개 가능' : '지금 가능'} ~ ${duration}`;
+}
+
+function toTimeLabel(dateTime: string) {
+    const date = new Date(dateTime);
+
+    if (Number.isNaN(date.getTime())) {
+        return dateTime.slice(11, 16);
+    }
+
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+
+    return `${hour}:${minute}`;
 }

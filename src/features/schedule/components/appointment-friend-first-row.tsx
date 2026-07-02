@@ -30,7 +30,11 @@ export function AppointmentFriendFirstRow({
 
             <div className="min-w-0 pt-1">
                 <p className="truncate text-lg text-relink-gray-700">{friend.name}</p>
-                <FriendAvailabilityTimeline availability={friend.availability} />
+                <FriendAvailabilityTimeline
+                    availability={friend.availability}
+                    fromLabel={friend.availabilityFromLabel}
+                    toLabel={friend.availabilityToLabel}
+                />
             </div>
 
             <button
@@ -44,7 +48,15 @@ export function AppointmentFriendFirstRow({
     );
 }
 
-function FriendAvailabilityTimeline({ availability }: { availability: AvailabilitySegmentStatus[] }) {
+function FriendAvailabilityTimeline({
+    availability,
+    fromLabel = '현재',
+    toLabel = '4시간 후',
+}: {
+    availability: AvailabilitySegmentStatus[];
+    fromLabel?: string;
+    toLabel?: string;
+}) {
     return (
         <div className="mt-1">
             <div
@@ -72,8 +84,8 @@ function FriendAvailabilityTimeline({ availability }: { availability: Availabili
                 })}
             </div>
             <div className="mt-0.5 flex justify-between text-sm text-relink-gray-400">
-                <span>20:00</span>
-                <span>24:30</span>
+                <span>{fromLabel}</span>
+                <span>{toLabel}</span>
             </div>
         </div>
     );

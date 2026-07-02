@@ -4,12 +4,22 @@ import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
 
 type ScheduleHeaderProps = {
     title?: string;
+    onBack?: () => void;
 };
 
-export function ScheduleHeader({ title = '캘린더' }: ScheduleHeaderProps) {
+export function ScheduleHeader({ title = '캘린더', onBack }: ScheduleHeaderProps) {
     return (
         <header className="flex items-center justify-between font-display">
-            <div className="flex items-end justify-between gap-1">
+            <div className="flex items-center gap-3">
+                {onBack ? (
+                    <button
+                        type="button"
+                        className="rounded-md bg-relink-lavender-soft px-3 py-1.5 text-sm text-relink-gray-700"
+                        onClick={onBack}
+                    >
+                        뒤로
+                    </button>
+                ) : null}
                 <div>
                     <h1 className="text-2xl text-gray-700">{title}</h1>
                 </div>

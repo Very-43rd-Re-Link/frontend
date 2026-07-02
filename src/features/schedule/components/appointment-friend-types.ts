@@ -8,4 +8,8 @@ export type AppointmentFriend = {
     imageUrl?: string | null;
     calendar?: AppointmentCalendar;
     availability: AvailabilitySegmentStatus[];
+    isActive?: boolean;
+    availableSlotCount?: number;
+    availabilityFromLabel?: string;
+    availabilityToLabel?: string;
 };

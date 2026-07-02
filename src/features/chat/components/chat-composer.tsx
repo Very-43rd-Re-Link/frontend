@@ -1,6 +1,7 @@
 import { type FormEvent, useId, useState } from 'react';
 
 import photoSvg from '@/assets/icons/photo.svg';
+import sendSvg from '@/assets/icons/send.svg';
 import { InlineSvgIcon } from '@/components/common/inline-svg-icon';
 
 type ChatComposerProps = {
@@ -56,7 +57,7 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
                         className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-relink-lavender-soft py-3 font-display text-md text-relink-gray-700"
                     >
                         <InlineSvgIcon svg={photoSvg} className="h-5 w-5" />
-                        Photo
+                        사진
                     </label>
                 </div>
             ) : null}
@@ -64,14 +65,14 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
             {selectedAttachment ? (
                 <div className="mb-3 flex items-center justify-between rounded-lg bg-relink-lavender-soft px-3 py-2">
                     <span className="min-w-0 truncate font-display text-sm text-relink-gray-700">
-                        Photo: {selectedAttachment.name}
+                        사진: {selectedAttachment.name}
                     </span>
                     <button
                         type="button"
                         className="ml-3 shrink-0 font-display text-sm text-relink-lavender-intense"
                         onClick={() => setSelectedAttachment(null)}
                     >
-                        Remove
+                        제거
                     </button>
                 </div>
             ) : null}
@@ -87,7 +88,7 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
 
                 <button
                     type="button"
-                    aria-label="Attach photo"
+                    aria-label="사진 첨부"
                     aria-expanded={isAttachmentOpen}
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-relink-lavender-soft font-display text-2xl text-relink-lavender-intense"
                     onClick={() => setIsAttachmentOpen((current) => !current)}
@@ -95,8 +96,8 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
                     +
                 </button>
                 <input
-                    aria-label="Message"
-                    placeholder="Message"
+                    aria-label="메시지"
+                    placeholder="메시지 입력"
                     value={text}
                     onChange={(event) => setText(event.currentTarget.value)}
                     className="min-w-0 flex-1 rounded-full bg-relink-lavender-soft px-4 py-3 font-display text-md text-relink-ink outline-none placeholder:text-relink-gray-400"
@@ -104,10 +105,10 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
                 <button
                     type="submit"
                     disabled={isSending}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-relink-lavender-intense font-display text-lg text-relink-white disabled:opacity-60"
-                    aria-label="Send message"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-relink-lavender-intense text-relink-white disabled:opacity-60"
+                    aria-label="메시지 보내기"
                 >
-                    Send
+                    <InlineSvgIcon svg={sendSvg} className="h-5 w-5 [&>svg]:fill-current" />
                 </button>
             </div>
         </form>

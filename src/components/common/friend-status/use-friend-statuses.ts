@@ -5,6 +5,7 @@ import {
     type FriendStatusMap,
 } from '@/api/friends';
 import type { RingSlots } from '@/components/common/friend-status/ring-colors';
+import type { AvailabilitySegmentStatus } from '@/features/schedule/components/appointment-friend-types';
 
 const STATUS_BATCH_SIZE = 10;
 
@@ -13,6 +14,10 @@ type StatusTarget = {
     slots: RingSlots;
     isActive?: boolean;
     activeColor?: string;
+    availability?: AvailabilitySegmentStatus[];
+    availableSlotCount?: number;
+    availabilityFromLabel?: string;
+    availabilityToLabel?: string;
     imageUrl?: string | null;
     status?: string;
 };
@@ -109,6 +114,10 @@ export function applyFriendStatuses<T extends StatusTarget>(targets: T[], status
             slots: status.slots,
             isActive: status.isActive,
             activeColor: status.activeColor,
+            availability: status.availability,
+            availableSlotCount: status.availableSlotCount,
+            availabilityFromLabel: status.fromLabel,
+            availabilityToLabel: status.toLabel,
             ...('status' in target ? { status: status.status } : {}),
         } as T;
     });

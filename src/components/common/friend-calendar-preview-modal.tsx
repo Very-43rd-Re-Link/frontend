@@ -12,6 +12,7 @@ export type FriendCalendarPreviewBlock = {
 type FriendCalendarPreviewModalProps = {
     friendNames: string[];
     blocks?: FriendCalendarPreviewBlock[];
+    status?: 'idle' | 'loading' | 'success' | 'error';
     onClose: () => void;
 };
 
@@ -31,7 +32,12 @@ export const multipleStatusClassNames: Record<PreviewSlotStatus, string> = {
     available: 'bg-relink-scheduleGreen',
 };
 
-export function FriendCalendarPreviewModal({ friendNames, blocks: providedBlocks, onClose }: FriendCalendarPreviewModalProps) {
+export function FriendCalendarPreviewModal({
+    friendNames,
+    blocks: providedBlocks,
+    status = 'success',
+    onClose,
+}: FriendCalendarPreviewModalProps) {
     const isMultiple = friendNames.length > 1;
     const blocks = providedBlocks ?? [];
     const statusClassNames = isMultiple ? multipleStatusClassNames : singleStatusClassNames;
@@ -50,10 +56,42 @@ export function FriendCalendarPreviewModal({ friendNames, blocks: providedBlocks
                 aria-label={title}
                 onClick={(event) => event.stopPropagation()}
             >
-                <FriendCalendarPreviewGrid blocks={blocks} statusClassNames={statusClassNames} />
+                <FriendCalendarPreviewContent
+                    blocks={blocks}
+                    status={status}
+                    statusClassNames={statusClassNames}
+                />
                 <p className="mt-5 text-sm text-relink-gray-400">*나의 일정에서 가능/조율로 표시한 시간대만 표시돼요.</p>
             </article>
         </div>
+    );
+}
+
+function FriendCalendarPreviewContent({
+    blocks,
+    status,
+    statusClassNames,
+}: {
+    blocks: FriendCalendarPreviewBlock[];
+    status: 'idle' | 'loading' | 'success' | 'error';
+    statusClassNames: Record<PreviewSlotStatus, string>;
+}) {
+    if (status === 'loading') {
+        return <FriendCalendarPreviewStateMessage title="캘린더를 불러오는 중" />;
+    }
+
+    if (status === 'error') {
+        return <FriendCalendarPreviewStateMessage title="캘린더를 불러오지 못했어요" />;
+    }
+
+    return <FriendCalendarPreviewGrid blocks={blocks} statusClassNames={statusClassNames} />;
+}
+
+function FriendCalendarPreviewStateMessage({ title }: { title: string }) {
+    return (
+        <section className="flex h-[580px] items-center justify-center text-center">
+            <p className="text-lg text-relink-gray-400">{title}</p>
+        </section>
     );
 }
 
@@ -93,7 +131,7 @@ function FriendCalendarPreviewGrid({
             {blocks.map((block, index) => (
                 <div
                     key={`${block.dayIndex}-${block.start}-${block.end}-${index}`}
-                    className={`rounded ${statusClassNames[block.status]}`}
+                    className={`min-h-0 w-full ${getBlockRadiusClassName(block, blocks)} ${statusClassNames[block.status]}`}
                     style={{
                         gridColumn: block.dayIndex + 2,
                         gridRow: `${getSlotRow(block.start)} / ${getSlotRow(block.end)}`,
@@ -114,4 +152,24 @@ function formatTime(time: number) {
     const minute = time % 1 === 0 ? '00' : '30';
 
     return `${String(hour).padStart(2, '0')}:${minute}`;
+}
+
+function getBlockRadiusClassName(block: FriendCalendarPreviewBlock, blocks: FriendCalendarPreviewBlock[]) {
+    const connectsToPrevious = blocks.some(
+        (candidate) =>
+            candidate.dayIndex === block.dayIndex &&
+            candidate.status === block.status &&
+            candidate.end === block.start,
+    );
+    const connectsToNext = blocks.some(
+        (candidate) =>
+            candidate.dayIndex === block.dayIndex &&
+            candidate.status === block.status &&
+            candidate.start === block.end,
+    );
+
+    return [
+        connectsToPrevious ? 'mt-0 rounded-t-none' : 'mt-0.5 rounded-t-md',
+        connectsToNext ? 'mb-0 rounded-b-none' : 'mb-0.5 rounded-b-md',
+    ].join(' ');
 }

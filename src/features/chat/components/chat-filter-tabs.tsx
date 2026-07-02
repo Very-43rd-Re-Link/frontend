@@ -10,11 +10,11 @@ type ChatFilterTab = {
 };
 
 const tabs: ChatFilterTab[] = [
-    { key: 'group', label: '그룹채팅', path: routePaths.chat },
+    { key: 'all', label: '전체', path: routePaths.chat },
+    { key: 'group', label: '그룹채팅', path: routePaths.chatGroup },
     { key: 'direct', label: '1:1 채팅', path: routePaths.chatDirect },
     { key: 'appointment', label: '약속방', path: routePaths.chatAppointments },
     { key: 'unread', label: '안 읽음', path: routePaths.chatUnread },
-    { key: 'all', label: '전체', path: routePaths.chatAll },
 ];
 
 export function ChatFilterTabs() {
@@ -24,7 +24,7 @@ export function ChatFilterTabs() {
                 <NavLink
                     key={tab.key}
                     to={tab.path}
-                    end={tab.path === routePaths.chat}
+                    end
                     className={({ isActive }) =>
                         `shrink-0 rounded-lg px-3 py-1.5 font-display text-md text-relink-gray-700 transition-colors ${
                             isActive ? 'bg-relink-lavender-middle' : 'bg-relink-lavender-soft'

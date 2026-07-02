@@ -49,6 +49,8 @@ type AppointmentResponse = {
         name: string;
         imageUrl: string | null;
     }[];
+    chatRoomId: number | null;
+    inviteLink: string | null;
 };
 
 export type UpcomingAppointment = AppointmentResponse;
@@ -96,11 +98,11 @@ export async function fetchAppointmentFriendCalendars(memberIds: number[], date:
         return [];
     }
 
+    const params = toMemberIdParams(memberIds);
+    params.set('date', formatDate(date));
+
     const response = await apiClient.get<FriendCalendarListResponse>('/appointments/friend-calendars', {
-        params: {
-            memberIds: memberIds.join(','),
-            date: formatDate(date),
-        },
+        params,
     });
 
     return response.friends.map<AppointmentFriend>((friend) => ({
@@ -118,4 +120,11 @@ function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+}
+
+function toMemberIdParams(memberIds: number[]) {
+    const params = new URLSearchParams();
+    memberIds.forEach((memberId) => params.append('memberIds', String(memberId)));
+
+    return params;
 }

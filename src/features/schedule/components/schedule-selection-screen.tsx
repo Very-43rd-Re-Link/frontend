@@ -35,6 +35,7 @@ type ScheduleSelectionScreenProps = {
     isSaving: boolean;
     onPointerCancel: () => void;
     onPointerUp: (event: PointerEvent<HTMLElement>) => void;
+    onBack?: () => void;
     onPreviousWeek: () => void;
     onNextWeek: () => void;
     onSlotClick: (dayIndex: number, time: number) => void;
@@ -64,6 +65,7 @@ export function ScheduleSelectionScreen({
     isSaving,
     onPointerCancel,
     onPointerUp,
+    onBack,
     onPreviousWeek,
     onNextWeek,
     onSlotClick,
@@ -83,7 +85,7 @@ export function ScheduleSelectionScreen({
             onPointerCancel={onPointerCancel}
             onPointerUp={onPointerUp}
         >
-            <ScheduleHeader title={title} />
+            <ScheduleHeader title={title} onBack={onBack} />
 
             <main className="relink-hidden-scrollbar flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 pb-2">
                 <WeekNavigator title={weekTitle} onPreviousWeek={onPreviousWeek} onNextWeek={onNextWeek} />

@@ -86,6 +86,14 @@ export function AppRoutes() {
                 path={routePaths.chat}
                 element={
                     <ProtectedRoute>
+                        <ChatListView tab="all" />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path={routePaths.chatGroup}
+                element={
+                    <ProtectedRoute>
                         <ChatListView tab="group" />
                     </ProtectedRoute>
                 }
@@ -118,7 +126,7 @@ export function AppRoutes() {
                 path={routePaths.chatAll}
                 element={
                     <ProtectedRoute>
-                        <ChatListView tab="all" />
+                        <Navigate to={routePaths.chat} replace />
                     </ProtectedRoute>
                 }
             />
